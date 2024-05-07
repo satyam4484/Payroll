@@ -1,6 +1,7 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mainRouter from "./routes/index.js";
 
 dotenv.config();
 
@@ -8,13 +9,13 @@ dotenv.config();
 const app = express();
 
 // Middleware to parse JSON bodies
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.raw());
+app.use(express.text());
 
 // Define a route for the root endpoint
-app.get('/', (req: Request, res: Response) => {
-    console.log(req.body || "No data received from the server");
-    res.send({ message: "Welcome to the TypeScript server" });
-});
+app.use('/api',mainRouter);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL || '', {
@@ -28,3 +29,4 @@ mongoose.connect(process.env.MONGO_URL || '', {
     console.error("Error connecting to the database:", error);
     process.exit(1); // Exit the process if database connection fails
 });
+export default app;
