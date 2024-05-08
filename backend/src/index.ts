@@ -23,7 +23,7 @@ mongoose.connect(process.env.MONGO_URL || '', {
     console.log("Database connected successfully");
     // Start the Express server
     app.listen(8000, () => {
-        console.log("Backend server started at port 8001");
+        console.log("Backend server started at port 8000");
     });
 }).catch(error => {
     console.error("Error connecting to the database:", error);
