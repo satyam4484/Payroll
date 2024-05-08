@@ -42,7 +42,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
     const userId = req.params.id;
     try {
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).populate("company").populate("category");
         if (!user) {
             return res.status(404).json({ error: true, errorData: { message: 'User not found' } });
         }
@@ -56,7 +56,7 @@ export const getUserById = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         // Fetch all users from the database
-        const users = await User.find();
+        const users = await User.find().select('-password').populate("category");
         // Send a success response with the list of users
         res.status(200).json({ error: false, users });
     } catch (error) {
