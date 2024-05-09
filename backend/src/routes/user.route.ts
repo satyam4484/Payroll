@@ -4,13 +4,16 @@ import {
     generatePassword,
     getUserById,
     getAllUsers,
-    updateUser
+    updateUser,
+    loginUser
 } from "../controllers/user.controller";
 
 const router = express.Router();
 
 // Route to create a new user
 router.post('/', createUser);
+
+router.post('/login', loginUser);
 
 // Route to generate a new password for a user
 router.post('/generatePassword', generatePassword);
