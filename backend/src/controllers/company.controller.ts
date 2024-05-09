@@ -25,7 +25,6 @@ export const getCompanyById = async (req: Request, res: Response) => {
         res.status(500).json({ error: true, errorData: { message: 'Error fetching company' } });
     }
 }
-
 export const getAllCompanies = async (req: Request, res: Response) => {
     try {
         const companies = await Company.find();

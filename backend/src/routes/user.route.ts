@@ -5,7 +5,8 @@ import {
     getUserById,
     getAllUsers,
     updateUser,
-    loginUser
+    loginUser,
+    getFilterUserData
 } from "../controllers/user.controller";
 
 const router = express.Router();
@@ -20,6 +21,8 @@ router.post('/generatePassword', generatePassword);
 
 // Route to get all users
 router.get('/', getAllUsers);
+
+router.get('/filter', getFilterUserData);
 
 // Route to get a user by ID
 router.get('/:id', getUserById);
