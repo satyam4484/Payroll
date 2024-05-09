@@ -29,6 +29,7 @@ export interface UserInterface {
     user_role: string;
     category:ObjectId;
     company:ObjectId;
+    payroll?:ObjectId;
 }
 
 // Mongoose schema for user data
@@ -50,8 +51,8 @@ const userSchema = new Schema<UserInterface>({
         enum: ["Employee", "Employer", "Admin", "CEO"], // User role values
     },
     category:{type:Schema.Types.ObjectId,ref:'Category',required:true},
-    company:{type:Schema.Types.ObjectId,ref:'Company',required:true}
-
+    company:{type:Schema.Types.ObjectId,ref:'Company',required:true},
+    payroll:{type:Schema.Types.ObjectId,ref:'Payroll'}
 });
 
 userSchema.pre("save",hashUserPassword);

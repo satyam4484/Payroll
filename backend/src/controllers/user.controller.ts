@@ -1,13 +1,47 @@
 import { Request, Response } from "express";
 import User, { UserInterface } from "../models/user.model";
 import secureRandomPassword from "secure-random-password";
-import { generateUniqueId } from "../services/services";
+import { generateUniqueId, generateAuthToken } from "../services/services";
 import bcrypt from "bcryptjs";
 
-export const generatePassword = async(req:Request,res:Response) => {
-    try{
-        const userId:string = req.body.user_id;
-        const user = await User.findOne({user_id:userId});
+
+export const loginUser = async (request: Request, response: Response) => {
+    try {
+        // Get the user data from the request body
+        const userData: { user_id: string; password: string } = request.body;
+
+        // Find a user with the provided user ID
+        const user = await User.findOne({ user_id: userData.user_id });
+
+        // Check if the user is found
+        if (user) {
+            // Check if the user's account is active
+
+            // Verify the password
+            const isPasswordValid = await bcrypt.compare(userData.password, user.password);
+
+            // If the password is verified, send a success response with an authentication token
+            if (isPasswordValid) {
+                const authToken = generateAuthToken(user._id);
+                response.send({ error: false, Mesage: "Logged in successfully", token: authToken });
+            } else {
+                // If the password is not valid, throw an error
+                throw "Invalid Password";
+            }
+        }else {
+        // If the user is not found, throw an error
+        throw "Invalid User ID";
+    }
+} catch (error) {
+    // Log the error and send an error response
+    response.status(500).send({error:true, errorData: { error }});
+}
+};
+
+export const generatePassword = async (req: Request, res: Response) => {
+    try {
+        const userId: string = req.body.user_id;
+        const user = await User.findOne({ user_id: userId });
         if (!user) {
             return res.status(404).json({ error: true, errorData: { message: 'User not found' } });
         }
@@ -16,9 +50,9 @@ export const generatePassword = async(req:Request,res:Response) => {
 
         user.password = await bcrypt.hash(password, 10);
         await user.save();
-        res.status(200).json({ error: false, message: 'Password generated successfully',user:{user_id:userId,password} });
+        res.status(200).json({ error: false, message: 'Password generated successfully', user: { user_id: userId, password } });
 
-    }catch(error){
+    } catch (error) {
         res.status(500).send({ error: true, errorData: { error } });
     }
 }
@@ -32,7 +66,7 @@ export const createUser = async (req: Request, res: Response) => {
         const user = new User({ user_id: uniqueId, password, ...data });
         const savedUser = await user.save();
 
-        res.status(201).json({ error: false, user:{user_id:savedUser.user_id,password} });
+        res.status(201).json({ error: false, user: { user_id: savedUser.user_id, password } });
     } catch (error) {
         // Handle any errors that occur during the process
         res.status(500).send({ error: true, errorData: { error } });
