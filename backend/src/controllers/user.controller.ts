@@ -26,11 +26,11 @@ export const loginUser = async (request: Request, response: Response) => {
                 response.send({ error: false, Mesage: "Logged in successfully", token: authToken });
             } else {
                 // If the password is not valid, throw an error
-                throw "Invalid Password";
+                throw new Error("Invalid Password");
             }
         }else {
         // If the user is not found, throw an error
-        throw "Invalid User ID";
+        throw new Error("Invalid User ID");
     }
 } catch (error) {
     // Log the error and send an error response
@@ -116,3 +116,26 @@ export const updateUser = async (req: Request, res: Response) => {
         res.status(500).send({ error: true, errorData: { error } });
     }
 }
+
+
+export const getFilterUserData = async(req:Request,res:Response) => {
+    try{
+        const queryParams = req.query;
+        let filter: any = {};
+        if (queryParams.company) {
+            filter.company = queryParams.company.toString();
+        }
+        if (queryParams.category) {
+            filter.category = queryParams.category.toString();
+        }
+        const users: UserInterface[] = await User.find(filter).select("-password").populate([
+            {path:'company',select:'name _id'},
+            {path:'category',select:'category_name _id'}
+        ]);
+        res.status(200).json({ error: false, users })
+
+    }catch(error) {
+        res.status(500).send({ error: true, errorData: { error } });
+    }
+}
+
