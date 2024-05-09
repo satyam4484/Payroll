@@ -121,7 +121,7 @@ export const updateUser = async (req: Request, res: Response) => {
 export const getFilterUserData = async(req:Request,res:Response) => {
     try{
         const queryParams = req.query;
-        let filter: any = {};
+        const filter: any = {};
         if (queryParams.company) {
             filter.company = queryParams.company.toString();
         }

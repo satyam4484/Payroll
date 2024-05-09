@@ -32,7 +32,7 @@ export const markAttendance = async (req: Request, res: Response) => {
 export const getTodayAttendance = async(req:Request,res:Response) => {
     try{
         const userId:string = req.params.id;
-        let todayDate = new Date(Date.now());
+        const todayDate = new Date(Date.now());
         todayDate.setHours(0,0,0,0);
         todayDate.setMinutes(todayDate.getMinutes() + 5.5 * 60);
         const attendance = await Attendance.findOne({user:userId,date:todayDate});
