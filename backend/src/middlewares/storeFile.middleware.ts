@@ -45,7 +45,7 @@ function createStorage(destinationFolder: string) {
 
                 try {
                     // Upload the file to S3 using the AWS SDK
-                    const data = await s3Client.send(new PutObjectCommand(params));
+                    s3Client.send(new PutObjectCommand(params));
                     const bucketName = `${bucket_name}.s3.${process.env.AWS_REGION}.amazonaws.com`;
 
                     // Resolve with the public URL of the uploaded file

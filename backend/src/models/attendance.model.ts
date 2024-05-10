@@ -1,4 +1,4 @@
-import {ObjectId, Schema,model} from "mongoose";
+import {Decimal128, ObjectId, Schema,model} from "mongoose";
 
 export interface AttendanceInterface{
     total:number;
@@ -12,7 +12,21 @@ const AttendanceSchema = new Schema<AttendanceInterface>({
     user:{type:Schema.Types.ObjectId,ref:'User',required:true}
 });
 
+export interface DailyAttendanceInterface {
+    user?: ObjectId;
+    date: Date;
+    status: Decimal128;
+    overtime: number;
+}
+
+const DailyAttendanceSchema = new Schema<DailyAttendanceInterface>({
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    date: { type: Date, required: true },
+    status: { type: Schema.Types.Decimal128, required: true },
+    overtime: { type: Number, default: 0 } // Assuming overtime is optional with default value 0
+});
+
 
 const Attendance = model<AttendanceInterface>("Attendance",AttendanceSchema);
-
-export default Attendance;
+const DailyAttendance = model<DailyAttendanceInterface>('DailyAttendance', DailyAttendanceSchema);
+export default {Attendance,DailyAttendance};
