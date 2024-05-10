@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import mainRouter from "./routes/index";
 
 dotenv.config();
@@ -13,6 +14,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.raw());
 app.use(express.text());
+
+app.use(cors({
+    origin: '*'
+}));
 
 // Define a route for the root endpoint
 app.use('/api',mainRouter);
