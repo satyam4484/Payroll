@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { Types } from "mongoose";
 dotenv.config();
 
+
 const generateRandomDigitNumber = () => {
     return Math.floor(Math.random() * 90000) + 10000;
 }
