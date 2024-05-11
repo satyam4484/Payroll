@@ -1,6 +1,9 @@
 import express from 'express';
+import multer from 'multer';
 
-import { markAttendance, getTodayAttendance,generateAttendanceExcel } from '../controllers/attendance.controller';
+const upload = multer({ dest: 'uploads/' });
+
+import { markAttendance, getTodayAttendance,generateAttendanceExcel,markAttendanceFromSheet } from '../controllers/attendance.controller';
 
 const router = express.Router();
 
@@ -12,6 +15,8 @@ router.get('/today/:id', getTodayAttendance);
 
 
 router.post('/sheet', generateAttendanceExcel);
+
+router.route('/mark_sheet').post(upload.single('file'),markAttendanceFromSheet);
 
 
 
