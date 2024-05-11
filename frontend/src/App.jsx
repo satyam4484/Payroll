@@ -5,15 +5,16 @@ import { useGlobalContext } from './provider/Context';
 import Routing from './routing';
 import Spinner from './ui/Spinner';
 import { getUserProfile } from './api/apiUrl';
+import Message from './ui/Message';
 
 const App = () => {
 
-  const { toggleSpinner, isLoading, loginUser, setUserProfile, userCred } = useGlobalContext();
+  const { toggleLoading, isLoading, loginUser, setUserProfile, userCred } = useGlobalContext();
   // console.log(userCred)
   const navigate = useNavigate();
 
   useEffect(() => {
-    toggleSpinner(true);
+    toggleLoading(true);
     if (localStorage.getItem("token")) {
       loginUser(localStorage.getItem("token"));
 
@@ -25,13 +26,11 @@ const App = () => {
     } else {
       navigate('/auth/login')
     }
-    toggleSpinner(false);
+    toggleLoading(false);
   }, [])
 
   return (
     <div>
-      {/* <Message /> */}
-      {isLoading && <Spinner />}
       <Routing />
     </div>
   )

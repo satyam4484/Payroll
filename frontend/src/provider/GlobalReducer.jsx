@@ -3,7 +3,7 @@ const initialState = {
     isLoggedIn: false,
     isLoading: false,
     userCred: {},
-    companyId: '',
+    companyId: "",
     error: { isError: false, message: "" },
 };
 
@@ -11,7 +11,7 @@ const initialState = {
 const globalReducer = (state, action) => {
     switch (action.type) {
 
-        case "TOGGLE_SPINNER":
+        case "TOGGLE_LOADING":
             return { ...state, isLoading: action.payload };
 
         case "SET_MESSAGE":
@@ -36,7 +36,7 @@ const globalReducer = (state, action) => {
         case "LOGOUT_USER":
             // Remove token from localStorage and update isLoggedIn
             localStorage.removeItem("token");
-            // localStorage.removeItem("companyId");
+            localStorage.removeItem("user_id");
             return { ...state, isLoggedIn: false }
 
         default:

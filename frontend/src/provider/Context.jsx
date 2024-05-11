@@ -7,16 +7,16 @@ const AppProvider = ({ children }) => {
     const [state, dispatch] = useReducer(globalReducer, initialState);
 
     // Function to toggle the loading spinner
-    const toggleSpinner = (data) => {
-        dispatch({ type: "TOGGLE_SPINNER", payload: data });
+    const toggleLoading = (isLoading) => {
+        dispatch({ type: "TOGGLE_LOADING", payload: isLoading });
     };
 
     // Function to set a message and show a toast message
-    const setMessage = (isError, type, message) => {
+    const setMessage = (isError, message) => {
         dispatch({
             type: "SET_MESSAGE",
             payload: {
-                isError, type, message
+                isError, message
             }
         });
     }
@@ -37,7 +37,6 @@ const AppProvider = ({ children }) => {
     // Function to log out a user
     const logoutUser = () => {
         dispatch({ type: "LOGOUT_USER" });
-
     };
 
     return (
@@ -48,7 +47,7 @@ const AppProvider = ({ children }) => {
             setMessage,
             setUserProfile,
             setCompanyId,
-            toggleSpinner
+            toggleLoading
         }}>
             {children}
         </AppContext.Provider>
