@@ -1,4 +1,5 @@
 import { ObjectId, Schema, model } from "mongoose";
+import { CategoryInterface } from "./category.model";
 import { hashUserPassword } from "../middlewares/middlewares";
 // Interface for user data with type safety
 export interface UserInterface {
@@ -27,7 +28,9 @@ export interface UserInterface {
     };
     password: string;
     user_role: string;
-    category:ObjectId;
+    category:CategoryInterface;
+    company:ObjectId;
+    payroll?:ObjectId;
 }
 
 // Mongoose schema for user data
@@ -48,7 +51,9 @@ const userSchema = new Schema<UserInterface>({
         type: String,
         enum: ["Employee", "Employer", "Admin", "CEO"], // User role values
     },
-    category:{type:Schema.Types.ObjectId,required:true}
+    category:{type:Schema.Types.ObjectId,ref:'Category',required:true},
+    company:{type:Schema.Types.ObjectId,ref:'Company',required:true},
+    payroll:{type:Schema.Types.ObjectId,ref:'Payroll'}
 });
 
 userSchema.pre("save",hashUserPassword);

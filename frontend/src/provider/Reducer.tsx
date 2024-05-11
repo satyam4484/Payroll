@@ -1,7 +1,7 @@
 export interface State {
     isLoggedIn: boolean;
     isLoading: boolean;
-    userCred: object; // Change 'any' to the type of user credentials
+    userCred: any;
     companyId: string;
     error: {
         isError: boolean;
@@ -12,8 +12,8 @@ export interface State {
 
 export interface Action {
     type: string;
-    payload?: any; // Change 'any' to the payload type
-    data?: any; // Change 'any' to the data type
+    payload?: any;
+    data?: any;
 }
 
 export const initialState: State = {
