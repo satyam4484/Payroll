@@ -11,7 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-user_data.txt
 
 # Editor directories and files
 .vscode/*
