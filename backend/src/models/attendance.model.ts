@@ -1,5 +1,5 @@
 import {Decimal128, ObjectId, Schema,model} from "mongoose";
-
+import { saveAttendanceCount } from "../middlewares/attendance.middleware";
 export interface AttendanceInterface{
     total:number;
     date:Date;
@@ -26,6 +26,7 @@ const DailyAttendanceSchema = new Schema<DailyAttendanceInterface>({
     overtime: { type: Number, default: 0 } // Assuming overtime is optional with default value 0
 });
 
+DailyAttendanceSchema.pre("save",saveAttendanceCount);
 
 const Attendance = model<AttendanceInterface>("Attendance",AttendanceSchema);
 const DailyAttendance = model<DailyAttendanceInterface>('DailyAttendance', DailyAttendanceSchema);
