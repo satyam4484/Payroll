@@ -18,7 +18,7 @@ export const logVariable = (variable: any): void => {
     const callerLine = stackTrace?.split("\n")[2]?.trim();
     const callerInfo = callerLine?.substring(callerLine.indexOf("at ") + 3);
     const variableName = Object.keys(globalThis).find(key => (globalThis as any)[key] === variable);
-    
+
     console.groupCollapsed(`🔍 Variable: ${variableName}`);
     console.log("📝 Value:", variable);
     console.log("📍 Called from:", callerInfo);
