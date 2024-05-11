@@ -76,7 +76,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
     const userId = req.params.id;
     try {
-        const user = await User.findById(userId).populate("company").populate("category");
+        const user = await User.findOne({user_id:userId}).populate("company").populate("category").populate("payroll");
         if (!user) {
             return res.status(404).json({ error: true, errorData: { message: 'User not found' } });
         }
