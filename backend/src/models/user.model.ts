@@ -1,4 +1,5 @@
 import { ObjectId, Schema, model } from "mongoose";
+import { CategoryInterface } from "./category.model";
 import { hashUserPassword } from "../middlewares/middlewares";
 // Interface for user data with type safety
 export interface UserInterface {
@@ -27,7 +28,7 @@ export interface UserInterface {
     };
     password: string;
     user_role: string;
-    category:ObjectId;
+    category:CategoryInterface;
     company:ObjectId;
     payroll?:ObjectId;
 }

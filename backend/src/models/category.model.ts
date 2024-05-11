@@ -3,7 +3,7 @@ import { Schema,model } from "mongoose";
 export interface CategoryInterface {
     category_name: string;
     logo?: string; // Optional property
-  }
+}
 
 
 const CategorySchema = new Schema<CategoryInterface>({
