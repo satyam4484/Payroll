@@ -1,12 +1,23 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Input from './Input'
 import { BASE_URL } from '../../api/apiClient';
 import axios from 'axios';
-import { createNewUser } from '../../api/apiUrl';
+import { createNewUser, getCategoryList, getCompanyList, getUserProfile, userLogin } from '../../api/apiUrl';
 import FileUpload from '../../ui/FileUpload';
 import ProfileUpload from '../../ui/ProfileUpload';
+import { useGlobalContext } from '../../provider/Context';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Signup = () => {
+
+    const { isLoggedIn, loginUser, setUserProfile, isLoading, toggleLoading } = useGlobalContext();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate("/app/dashboard");
+        }
+    }, [isLoggedIn, navigate]);
 
     const [message, setMessage] = useState('')
     const [errorMessage, setErrorMessage] = useState('');
@@ -25,6 +36,27 @@ const Signup = () => {
     const [pfFileUrl, setPfFileUrl] = useState('')
     const [esicFileUrl, setEsicFileUrl] = useState('')
     const [profileFileUrl, setProfileFileUrl] = useState('')
+
+    const [categories, setCategories] = useState([]);
+    const [companies, setCompanies] = useState([]);
+
+    useEffect(() => {
+        // Fetch category list
+        getCategoryList().then((response) => {
+            if (response.error == false) {
+                setCategories(response.categories);
+                // console.log(response.categories);
+            }
+        });
+
+        // Fetch company list
+        getCompanyList().then((response) => {
+            if (response.error == false) {
+                setCompanies(response.companies);
+                // console.log(response.companies);
+            }
+        });
+    }, []);
 
     const handleFileChange = async (e) => {
 
@@ -111,6 +143,8 @@ const Signup = () => {
         esicNumber: '',
         esicPhoto: '',
         unNumber: '',
+        category: '',
+        company: ''
     });
 
     const [fieldErrors, setFieldErrors] = useState({
@@ -129,6 +163,24 @@ const Signup = () => {
         setFormData({
             ...formData,
             [name]: value,
+        });
+    };
+
+    // Function to handle category selection
+    const handleCategoryChange = (e) => {
+        const categoryId = e.target.value;
+        setFormData({
+            ...formData,
+            category: categoryId,
+        });
+    };
+
+    // Function to handle company selection
+    const handleCompanyChange = (e) => {
+        const companyId = e.target.value;
+        setFormData({
+            ...formData,
+            company: companyId,
         });
     };
 
@@ -194,6 +246,8 @@ const Signup = () => {
             esicNumber: '',
             esicPhoto: '',
             unNumber: '',
+            category: '',
+            company: ''
         });
 
         setAadharFileUrl('')
@@ -239,51 +293,74 @@ const Signup = () => {
                 esic_photo: esicFileUrl || '',
             },
             un_no: formData.unNumber || '',
+            category: formData.category,
+            company: formData.company,
         };
 
         console.log(commonData)
 
-        // createNewUser(commonData).then((response) => {
-        //     if (response.error === false) {
-        //         console.log(response)
+        // Signup - create new user
+        createNewUser(commonData).then((responseSignup) => {
+            if (responseSignup.error === false) {
+                // console.log("responseSignup:", responseSignup.user)
 
-        //         setMessageState(true)
-        //         setMessage('New account created succesfully!')
-        //         resetForm();
+                resetForm();
 
-        //         setTimeout(() => {
-        //             setMessageState(false)
-        //             setMessage('')
-        //         }, [2000])
-        //     }
-        // }).catch((error) => {
-        //     // console.log(error)
-        //     setMessageState(false)
-        //     setMessage('Something went wrong! Please fill required fields!')
+                const userData = {
+                    user_id: responseSignup.user.user_id,
+                    password: responseSignup.user.password
+                }
 
-        //     setTimeout(() => {
-        //         setMessage('')
-        //     }, [2000])
+                // As soon as new account creates sucessfully direct Login the user
+                userLogin(userData).then((responseLogin) => {
+                    if (responseLogin.error === false) {
+                        // console.log("responseLogin", responseLogin)
 
-        // }).finally(() => {
-        //     setIsSubmitting(false)
-        // })
+                        localStorage.setItem("user_id", userData.user_id);
+                        localStorage.setItem("token", responseLogin.token);
+                        navigate('/app/dashboard');
+
+                        // Fetch user profile data
+                        getUserProfile(userData.user_id).then(
+                            (responseUserProfile) => {
+
+                                if (responseUserProfile.error === false) {
+                                    // console.log("responseUserProfile:", responseUserProfile.user)
+                                    setUserProfile(responseUserProfile.user)
+                                }
+                            }
+                        );
+                    }
+                })
+            }
+        }).catch((error) => {
+            console.log(error)
+            setMessageState(false)
+            setMessage('Something went wrong! Please fill required fields!')
+            setTimeout(() => {
+                setMessage('')
+            }, [2000])
+        }).finally(() => {
+            setIsSubmitting(false)
+        })
 
     };
 
 
     return (
         <div className="flex flex-col items-center h-screen md:h-screen lg:h-screen">
-            <h1 className="poppins font-semibold mb-10 text-2xl md:text-3xl lg:text-3xl">Create Account</h1>
+
+            <h1 className="poppins font-semibold mt-10 mb-5 text-2xl md:text-3xl lg:text-3xl">Join Us Today and Unlock Endless Possibilities!</h1>
+
             <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-3 items-end gap-4">
+                <div className="grid grid-cols-3 items-end gap-x-10 gap-y-5">
 
                     <Input type="text" label="Name" name="name" placeholder="Enter Name" value={formData.name} onChange={handleInputChange} />
 
                     <Input type="email" label="Email" name="email" placeholder="Enter Email ID" value={formData.email} onChange={handleInputChange} />
 
                     {/* UpdateProfilePic */}
-                    <div className='flex space-x-3 items-end mb-4'>
+                    <div className='flex space-x-3 items-end'>
                         <ProfileUpload inputRef={profileInputRef} name="profilePhoto" handleFileChange={handleFileChange} handleSelectFile={handleSelectFileProfile} fileUrl={profileFileUrl} />
                     </div>
 
@@ -324,23 +401,67 @@ const Signup = () => {
                         <FileUpload name="esicPhoto" inputRef={esicInputRef} handleFileChange={handleFileChange} handleSelectFile={handleSelectFileEsic} fileUrl={esicFileUrl} />
                     </div>
 
+                    <div className="flex flex-col">
+                        <label htmlFor="selectCompany" className="text-sm text-gray-500 my-1">
+                            Select Company
+                        </label>
+                        <select
+                            name="company"
+                            id="selectCompany"
+                            value={formData.company}
+                            onChange={handleCompanyChange}
+                            className="focus:outline-0 focus:ring-1 focus:ring-[#E87F01] focus:border-transparent border border-blue-gray-100 rounded-xl w-72 md:w-80 lg:w-80 shadow-md py-2 px-3 md:p-3 lg:p-[0.82rem] transition-all duration-300"
+                        >
+                            <option value="" disabled>Select Company</option>
+                            {companies.map((company) => (
+                                <option key={company._id} value={company._id}>
+                                    {company.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="flex flex-col">
+                        <label htmlFor="selectCategory" className="text-sm text-gray-500 my-1">
+                            Select Category
+                        </label>
+                        <select
+                            name="category"
+                            id="selectCategory"
+                            value={formData.category}
+                            onChange={handleCategoryChange}
+                            className="focus:outline-0 focus:ring-1 focus:ring-[#E87F01] focus:border-transparent border border-blue-gray-100 rounded-xl w-72 md:w-80 lg:w-80 shadow-md py-2 px-3 md:p-3 lg:p-[0.82rem] transition-all duration-300"
+                        >
+                            <option value="" disabled>Select Category</option>
+                            {categories.map((category) => (
+                                <option key={category._id} value={category._id}>
+                                    {category.category_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                 </div>
 
-                <div className='text-center mt-6 mb-3'>
+                <div className='text-center my-9'>
                     <button
                         type='submit'
                         className='rounded-3xl plus-jkrt shadow-lg text-white bg-[#24B6E9] hover:bg-[#27c0f8] py-2 px-3 w-72 disabled:bg-[#23B0E2]/50 disabled:cursor-not-allowed'
-                    // disabled={!isFormValid || isSubmitting}
+                        disabled={!isFormValid || isSubmitting}
                     >
-                        Submit
-                        {/* {isSubmitting ? 'Submitting...' : 'Submit'} */}
+                        Register
                     </button>
                 </div>
             </form>
 
+            <div className='flex space-x-3 text-sm mb-5'>
+                <p>Already have an account?</p>
+                <Link to="/auth/login" className='underline text-blue-500'>Login</Link>
+            </div>
+
             {
                 message && (
-                    <div className='text-center mt-8 mb-4'>
+                    <div className='text-center'>
                         <p className={`capitalize text-xl poppins ${messageState ? 'text-green-500' : 'text-red-500'} font-semibold`}>{message}</p>
                     </div>
                 )

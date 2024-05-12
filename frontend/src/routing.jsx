@@ -13,18 +13,18 @@ const Routing = () => {
     return (
         <Suspense fallback={<Spinner />}>
             <Routes>
-                <Route path='/' element={<Outlet />} >
+                <Route path="/" element={<Outlet />}>
                     <Route index element={<Render />} />
-                    <Route path='/app' element={<Outlet />} >
-                        <Route path="*" element={<NoPage />} />
-                        <Route path='dashboard' element={<Dashboard />} />
+                    <Route path="/app" element={<Outlet />}>
+                        <Route index element={<NoPage />} />
+                        <Route path="dashboard" element={<Dashboard />} />
                     </Route>
                 </Route>
 
-                <Route path='/auth' element={<Outlet />} >
-                    <Route path="*" element={<NoPage />} />
-                    <Route path='login' element={<Login />} />
-                    <Route path='signup' element={<Signup />} />
+                <Route path="/auth" element={<Outlet />}>
+                    <Route index element={<NoPage />} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="signup" element={<Signup />} />
                 </Route>
 
                 <Route path="*" element={<NoPage />} />

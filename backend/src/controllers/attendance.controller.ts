@@ -148,21 +148,21 @@ export const markAttendanceFromSheet = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
         filePath = req.file.path;
-        let date = new Date(req.body.date);
+        const date = new Date(req.body.date);
         const workbook = xlsx.readFile(filePath);
         const worksheet = workbook.Sheets.attendance;
         const jsonData: any = xlsx.utils.sheet_to_json(worksheet, { raw: false });
 
         let i = 0;
         while (i < jsonData.length) {
-            let data = jsonData[i];
-            let overtime = jsonData[i + 1];
+            const data = jsonData[i];
+            const overtime = jsonData[i + 1];
             const user = await User.findOne({ user_id: data['Employee Id'] })
             if (user) {
                 for (let id = 1; id < 32; id++) {
                     if (data[id]) {
                         date.setDate(id);
-                        const prevAttendance = await DailyAttendance.findOne({ user: user._id, date: date });
+                        const prevAttendance = await DailyAttendance.findOne({ user: user._id, date });
                         if (prevAttendance === null) {
                             const attendance = new DailyAttendance({
                                 user: user._id,
