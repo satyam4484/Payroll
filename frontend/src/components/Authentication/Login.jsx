@@ -20,7 +20,7 @@ const Login = () => {
 
     useEffect(() => {
         if (isLoggedIn) {
-            navigate("/app/dashboard");
+            navigate("/");
         }
     }, [isLoggedIn, navigate]);
 
@@ -68,7 +68,7 @@ const Login = () => {
 
                     localStorage.setItem("user_id", formData.user_id);
                     localStorage.setItem("token", response.token);
-                    navigate('/app/dashboard');
+                    navigate('/');
 
                     // Fetch user profile data
                     getUserProfile(formData.user_id).then(
@@ -152,10 +152,10 @@ const Login = () => {
                 </form>
             </div>
 
-            <div className='flex space-x-3 text-sm mb-5'>
+            {/* <div className='flex space-x-3 text-sm mb-5'>
                 <p>Don't have an account?</p>
                 <Link to="/auth/signup" className='underline text-blue-500'>Create Account</Link>
-            </div>
+            </div> */}
 
             <Message />
         </div>
