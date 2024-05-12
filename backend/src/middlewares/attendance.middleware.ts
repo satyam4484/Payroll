@@ -20,5 +20,5 @@ export async function saveAttendanceCount(this: any, next: Function){
         console.error(error);
         next(error);
     }
-    
+
 }

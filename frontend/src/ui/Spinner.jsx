@@ -9,7 +9,7 @@ const Spinner = ({ newClass }) => {
 
     return (
         <div className='flex items-center justify-center'>
-            <img src={spinner} className={newClass} />
+            <img src={spinner} className={`w-8 ${newClass}`} />
         </div>
     )
 }
