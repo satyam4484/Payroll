@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
+import fs from "fs";
 import User from "../models/user.model";
 import AttendanceModel, { DailyAttendanceInterface } from "../models/attendance.model"
 import excel from "exceljs";
-import { getGMT, logVariable } from "../services/services";
+import xlsx from "xlsx";
+import { getGMT } from "../services/services";
 import { AttendanceColumns } from "../services/data.services";
 import { S3Client, PutObjectCommandInput, PutObjectCommand } from "@aws-sdk/client-s3";
-const { Attendance, DailyAttendance } = AttendanceModel;
+const { DailyAttendance } = AttendanceModel;
 
 const s3 = new S3Client({
     credentials: {
@@ -16,8 +18,6 @@ const s3 = new S3Client({
 });
 
 const bucket_name = process.env.BUCKET_NAME as string;
-
-
 
 export const markAttendance = async (req: Request, res: Response) => {
     try {
@@ -30,19 +30,6 @@ export const markAttendance = async (req: Request, res: Response) => {
             overtime: data.overtime
         });
         await dailyattendance.save();
-        let attendance = await Attendance.findOne({ user: data.user });
-        if (attendance) {
-            let newCount: number = attendance.total + 1;
-            if (date.getMonth() != attendance.date.getMonth()) {
-                newCount = 1;
-            } else if (date.getDate() === attendance.date.getDate()) {
-                newCount = newCount - 1;
-            }
-            await Attendance.findByIdAndUpdate(attendance._id, { $set: { total: newCount, date } })
-        } else {
-            attendance = new Attendance({ total: 1, date, user: data.user })
-            attendance.save()
-        }
         res.status(201).send({ error: false, Mesage: "Attendance Marked Successfully" })
     } catch (error) {
         console.log(error)
@@ -70,9 +57,8 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
             { path: 'category', select: 'category_name' }
         ]);
         const promises: Promise<void>[] = [];
-        let counter:number = 1;
+        let counter: number = 1;
         const attendanceData: any[] = [];
-
         for (const user of users) {
             const promise = (async () => {
                 const attendance = await DailyAttendance.find({ date: { $gte: date, $lt: firstDayOfNextMonth }, user: user._id }).sort({ date: 1 });
@@ -88,15 +74,13 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
                 overtimeData.category = '';
                 let totalAttendance: any = 0.0;
                 let totalOt: number = 0;
-
-
-                let j=0;
+                let j = 0;
                 for (let i = 0; i < 31; i++) {
                     const currDate = getGMT(new Date(date));
                     currDate.setDate(i + 1);
                     let status;
                     let overtime;
-                    if(j<attendance.length) {
+                    if (j < attendance.length) {
                         const att = attendance[j];
                         if (att.date.getDate() === currDate.getDate() &&
                             att.date.getMonth() === currDate.getMonth() &&
@@ -111,29 +95,23 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
                     userData[i + 1] = status || '';
                     overtimeData[i + 1] = overtime || '';
                 }
-
                 userData.total = totalAttendance;
                 userData.ot = totalOt;
                 attendanceData.push(userData);
                 attendanceData.push(overtimeData);
-
             })();
             counter++;
             promises.push(promise);
         }
-
         await Promise.all(promises);
         const workbook = new excel.Workbook();
-        const sheet = workbook.addWorksheet(date.getFullYear()+'_'+date.getMonth()+'_'+date.getDate());
+        const sheet = workbook.addWorksheet(date.getFullYear() + '_' + date.getMonth() + '_' + date.getDate());
         sheet.columns = AttendanceColumns;
         for (const data of attendanceData) {
             sheet.addRow(data);
         }
-
-
         const excelBuffer = await workbook.xlsx.writeBuffer();
-        const s3fileLocation = `Attendance/Monthly/Attendance_${date.getFullYear()}_${date.getMonth()+1}_${date.getDate()}.xlsx`;
-
+        const s3fileLocation = `Attendance/Monthly/Attendance_${date.getFullYear()}_${date.getMonth() + 1}_${date.getDate()}.xlsx`;
         const uploadParams: PutObjectCommandInput = {
             Bucket: bucket_name,
             Key: s3fileLocation,
@@ -141,14 +119,67 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
         };
         const uploadCommand = new PutObjectCommand(uploadParams);
         await s3.send(uploadCommand);
-
         // Construct the S3 file URL
         const s3FileUrl = `https://${bucket_name}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3fileLocation}`;
-
         // Send the S3 URL as a response
         res.status(200).send({ error: false, data: s3FileUrl });
     } catch (error) {
-        console.log("error occured in generating excel ",error);
-        res.status(500).send({ error: true, errorData:{error} });
+        res.status(500).send({ error: true, errorData: { error } });
+    }
+}
+
+export const markAttendanceFromSheet = async (req: Request, res: Response) => {
+    let filePath;
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+        filePath = req.file.path;
+        const date = new Date(req.body.date);
+        const workbook = xlsx.readFile(filePath);
+        const worksheet = workbook.Sheets.attendance;
+        const jsonData: any = xlsx.utils.sheet_to_json(worksheet, { raw: false });
+
+        let i = 0;
+        while (i < jsonData.length) {
+            const data = jsonData[i];
+            const overtime = jsonData[i + 1];
+            const user = await User.findOne({ user_id: data['Employee Id'] })
+            if (user) {
+                for (let id = 1; id < 32; id++) {
+                    if (data[id]) {
+                        date.setDate(id);
+                        const prevAttendance = await DailyAttendance.findOne({ user: user._id, date });
+                        if (prevAttendance === null) {
+                            const attendance = new DailyAttendance({
+                                user: user._id,
+                                date,
+                                status: data[id],
+                                overtime: overtime[id]
+                            });
+                            console.log(attendance);
+                            await attendance.save();
+                        }
+                    }
+                }
+            }
+            i++;
+        }
+        res.status(200).send({ error: false, Message: "Attendance marked" });
+    } catch (error) {
+        res.status(500).send({ error: true, errorData: { error } });
+    } finally {
+        // Delete the uploaded file from the server's file system (whether the operation succeeded or failed)
+        if (filePath) {
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    // Handle any error that occurs during file deletion
+                    console.log("Error deleting the uploaded file:", err);
+                } else {
+                    // Debug message indicating successful file deletion
+                    console.log("Uploaded file deleted successfully");
+                }
+            });
+        }
     }
 }

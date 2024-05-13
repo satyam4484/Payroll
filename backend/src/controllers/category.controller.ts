@@ -12,7 +12,7 @@ export const addCategory = async (req: Request, res: Response) => {
         const savedCategory = await newCategory.save();
 
         // Send a success response with the saved category data
-        res.status(201).json({error:false,savedCategory});
+        res.status(201).json({ error: false, savedCategory });
     } catch (error) {
         // Handle any errors that occur during the process
         res.status(500).send({ error: true, errorData: { error } });
