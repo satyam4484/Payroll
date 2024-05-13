@@ -19,8 +19,6 @@ const s3 = new S3Client({
 
 const bucket_name = process.env.BUCKET_NAME as string;
 
-
-
 export const markAttendance = async (req: Request, res: Response) => {
     try {
         const data: DailyAttendanceInterface = req.body;
@@ -61,7 +59,6 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
         const promises: Promise<void>[] = [];
         let counter: number = 1;
         const attendanceData: any[] = [];
-
         for (const user of users) {
             const promise = (async () => {
                 const attendance = await DailyAttendance.find({ date: { $gte: date, $lt: firstDayOfNextMonth }, user: user._id }).sort({ date: 1 });
@@ -77,8 +74,6 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
                 overtimeData.category = '';
                 let totalAttendance: any = 0.0;
                 let totalOt: number = 0;
-
-
                 let j = 0;
                 for (let i = 0; i < 31; i++) {
                     const currDate = getGMT(new Date(date));
@@ -100,17 +95,14 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
                     userData[i + 1] = status || '';
                     overtimeData[i + 1] = overtime || '';
                 }
-
                 userData.total = totalAttendance;
                 userData.ot = totalOt;
                 attendanceData.push(userData);
                 attendanceData.push(overtimeData);
-
             })();
             counter++;
             promises.push(promise);
         }
-
         await Promise.all(promises);
         const workbook = new excel.Workbook();
         const sheet = workbook.addWorksheet(date.getFullYear() + '_' + date.getMonth() + '_' + date.getDate());
@@ -118,11 +110,8 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
         for (const data of attendanceData) {
             sheet.addRow(data);
         }
-
-
         const excelBuffer = await workbook.xlsx.writeBuffer();
         const s3fileLocation = `Attendance/Monthly/Attendance_${date.getFullYear()}_${date.getMonth() + 1}_${date.getDate()}.xlsx`;
-
         const uploadParams: PutObjectCommandInput = {
             Bucket: bucket_name,
             Key: s3fileLocation,
@@ -130,10 +119,8 @@ export const generateAttendanceExcel = async (req: Request, res: Response) => {
         };
         const uploadCommand = new PutObjectCommand(uploadParams);
         await s3.send(uploadCommand);
-
         // Construct the S3 file URL
         const s3FileUrl = `https://${bucket_name}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3fileLocation}`;
-
         // Send the S3 URL as a response
         res.status(200).send({ error: false, data: s3FileUrl });
     } catch (error) {
@@ -173,7 +160,6 @@ export const markAttendanceFromSheet = async (req: Request, res: Response) => {
                             console.log(attendance);
                             await attendance.save();
                         }
-
                     }
                 }
             }

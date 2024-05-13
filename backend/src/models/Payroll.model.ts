@@ -4,23 +4,23 @@ import { Schema, model, Decimal128 } from "mongoose";
 // Define the Payroll interface for the model
 export interface PayrollInterface {
     HRA: {
-        value:number;
+        value: number;
         operation: number;
     };
     Conveyance: {
-        value:number;
+        value: number;
         operation: number;
     };
     WashingAllowance: {
-        value:number;
+        value: number;
         operation: number;
     };
     MedicalAllowance: {
-        value:number;
+        value: number;
         operation: number;
     };
     OtherAllowance: {
-        value:number;
+        value: number;
         operation: number;
     };
     EmployeePF: {

@@ -3,7 +3,6 @@ import { S3Client, PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/clie
 import multer from 'multer';
 import { Request } from 'express';
 
-
 function createStorage(destinationFolder: string) {
     // Create an S3 client instance for interacting with Amazon S3
     const s3Client = new S3Client({

@@ -4,7 +4,7 @@ import { hashUserPassword } from "../middlewares/middlewares";
 // Interface for user data with type safety
 export interface UserInterface {
     name: string;
-    user_id?:string;
+    user_id?: string;
     profile_pic: string;
     email: string;
     contact: string;
@@ -28,15 +28,15 @@ export interface UserInterface {
     };
     password: string;
     user_role: string;
-    category:CategoryInterface;
-    company:ObjectId;
-    payroll?:ObjectId;
+    category: CategoryInterface;
+    company: ObjectId;
+    payroll?: ObjectId;
 }
 
 // Mongoose schema for user data
 const userSchema = new Schema<UserInterface>({
     name: { type: String, required: true },
-    user_id: {type: String,unique: true,optional:true},
+    user_id: { type: String, unique: true, optional: true },
     profile_pic: String,
     email: { type: String, required: true, unique: true }, // Make email unique
     contact: String,
@@ -51,12 +51,12 @@ const userSchema = new Schema<UserInterface>({
         type: String,
         enum: ["Employee", "Employer", "Admin", "CEO"], // User role values
     },
-    category:{type:Schema.Types.ObjectId,ref:'Category',required:true},
-    company:{type:Schema.Types.ObjectId,ref:'Company',required:true},
-    payroll:{type:Schema.Types.ObjectId,ref:'Payroll'}
+    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    company: { type: Schema.Types.ObjectId, ref: 'Company', required: true },
+    payroll: { type: Schema.Types.ObjectId, ref: 'Payroll' }
 });
 
-userSchema.pre("save",hashUserPassword);
+userSchema.pre("save", hashUserPassword);
 
 
 const User = model<UserInterface>("User", userSchema);

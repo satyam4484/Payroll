@@ -6,25 +6,25 @@ import User from "../models/user.model";
 // Create a new payroll
 export const createPayroll = async (req: Request, res: Response) => {
     try {
-        const data: any= req.body;
+        const data: any = req.body;
         const newPayroll = new Payroll({
-            HRA:data.HRA,
-            Conveyance:data.Conveyance,
-            WashingAllowance:data.WashingAllowance,
-            MedicalAllowance:data.MedicalAllowance,
-            OtherAllowance:data.OtherAllowance,
-            EmployeePF:data.EmployeePF,
-            EmployeesESIC:data.EmployeesESIC,
-            PT:data.PT,
-            MLWF:data.MLWF,
-            EmployerPF:data.EmployerPF,
-            EmployerESIC:data.EmployerESIC
+            HRA: data.HRA,
+            Conveyance: data.Conveyance,
+            WashingAllowance: data.WashingAllowance,
+            MedicalAllowance: data.MedicalAllowance,
+            OtherAllowance: data.OtherAllowance,
+            EmployeePF: data.EmployeePF,
+            EmployeesESIC: data.EmployeesESIC,
+            PT: data.PT,
+            MLWF: data.MLWF,
+            EmployerPF: data.EmployerPF,
+            EmployerESIC: data.EmployerESIC
         });
         const savedPayroll = await newPayroll.save();
-        if(data.type ==="company"){
-            await Company.findByIdAndUpdate(data._id,{$set:{payroll:savedPayroll._id}},{new:true});
-        }else if(data.type ==="Employee"){
-            await User.findByIdAndUpdate(data._id,{$set:{payroll:savedPayroll._id}},{new:true});
+        if (data.type === "company") {
+            await Company.findByIdAndUpdate(data._id, { $set: { payroll: savedPayroll._id } }, { new: true });
+        } else if (data.type === "Employee") {
+            await User.findByIdAndUpdate(data._id, { $set: { payroll: savedPayroll._id } }, { new: true });
         }
         res.status(201).json({ error: false, savedPayroll });
     } catch (error) {

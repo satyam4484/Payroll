@@ -1,4 +1,4 @@
-import { Schema,model } from "mongoose";
+import { Schema, model } from "mongoose";
 
 export interface CategoryInterface {
     category_name: string;
@@ -7,14 +7,14 @@ export interface CategoryInterface {
 
 
 const CategorySchema = new Schema<CategoryInterface>({
-    category_name:{
-        type:String,
-        required:true
+    category_name: {
+        type: String,
+        required: true
     },
-    logo:{
-        type:String
+    logo: {
+        type: String
     }
 });
 
-const Category = model<CategoryInterface>('Category',CategorySchema);
+const Category = model<CategoryInterface>('Category', CategorySchema);
 export default Category;

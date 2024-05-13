@@ -10,11 +10,11 @@ import fileUpload from './fileupload.route';
 
 
 
-router.use('/category',categoryRouter);
-router.use('/user',userRouter);
-router.use('/company',companyRouter);
-router.use('/attendance',attendanceRouter);
-router.use('/payroll',PayrollRouter);
+router.use('/category', categoryRouter);
+router.use('/user', userRouter);
+router.use('/company', companyRouter);
+router.use('/attendance', attendanceRouter);
+router.use('/payroll', PayrollRouter);
 router.use('/file', fileUpload);
 
 export default router;
