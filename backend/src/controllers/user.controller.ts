@@ -28,14 +28,14 @@ export const loginUser = async (request: Request, response: Response) => {
                 // If the password is not valid, throw an error
                 throw new Error("Invalid Password");
             }
-        }else {
-        // If the user is not found, throw an error
-        throw new Error("Invalid User ID");
+        } else {
+            // If the user is not found, throw an error
+            throw new Error("Invalid User ID");
+        }
+    } catch (error) {
+        // Log the error and send an error response
+        response.status(500).send({ error: true, errorData: { error } });
     }
-} catch (error) {
-    // Log the error and send an error response
-    response.status(500).send({error:true, errorData: { error }});
-}
 };
 
 export const generatePassword = async (req: Request, res: Response) => {
@@ -76,7 +76,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
     const userId = req.params.id;
     try {
-        const user = await User.findOne({user_id:userId}).populate("company").populate("category").populate("payroll");
+        const user = await User.findOne({ user_id: userId }).populate("company").populate("category").populate("payroll");
         if (!user) {
             return res.status(404).json({ error: true, errorData: { message: 'User not found' } });
         }
@@ -118,8 +118,8 @@ export const updateUser = async (req: Request, res: Response) => {
 }
 
 
-export const getFilterUserData = async(req:Request,res:Response) => {
-    try{
+export const getFilterUserData = async (req: Request, res: Response) => {
+    try {
         const queryParams = req.query;
         const filter: any = {};
         if (queryParams.company) {
@@ -129,12 +129,12 @@ export const getFilterUserData = async(req:Request,res:Response) => {
             filter.category = queryParams.category.toString();
         }
         const users: UserInterface[] = await User.find(filter).select("-password").populate([
-            {path:'company',select:'name _id'},
-            {path:'category',select:'category_name _id'}
+            { path: 'company', select: 'name _id' },
+            { path: 'category', select: 'category_name _id' }
         ]);
         res.status(200).json({ error: false, users })
 
-    }catch(error) {
+    } catch (error) {
         res.status(500).send({ error: true, errorData: { error } });
     }
 }

@@ -1,15 +1,15 @@
 import { ObjectId, Schema, model } from 'mongoose';
 
-export interface CompanyInterface{
-    name:string;
-    logo:string;
-    email:string;
-    contact:string;
-    address:string;
-    location:string;
-    city:string;
-    pincode:string;
-    payroll:ObjectId;
+export interface CompanyInterface {
+    name: string;
+    logo: string;
+    email: string;
+    contact: string;
+    address: string;
+    location: string;
+    city: string;
+    pincode: string;
+    payroll: ObjectId;
 }
 
 const CompanySchema = new Schema<CompanyInterface>({
@@ -21,7 +21,7 @@ const CompanySchema = new Schema<CompanyInterface>({
     location: { type: String, required: true },
     city: { type: String, required: true },
     pincode: { type: String, required: true },
-    payroll:{type:Schema.Types.ObjectId,ref:'Payroll'}
+    payroll: { type: Schema.Types.ObjectId, ref: 'Payroll' }
 });
 
 const Company = model<CompanyInterface>('Company', CompanySchema);

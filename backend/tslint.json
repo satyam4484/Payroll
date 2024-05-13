@@ -1,13 +1,16 @@
 {
-    "extends": "tslint:recommended",
-    "defaultSeverity": "warning",
-    "rules": {
-        "no-console": {
-          "severity": "warning",
-          "options": ["debug", "info", "log", "trace"]
-        }
-      },
-        
-    
-    "jsrules": {}
+  "extends": "tslint:recommended",
+  "defaultSeverity": "warning",
+  "rules": {
+    "no-console": {
+      "severity": "warning",
+      "options": [
+        "debug",
+        "info",
+        "log",
+        "trace"
+      ]
+    }
+  },
+  "jsrules": {}
 }
