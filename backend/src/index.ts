@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // Define a route for the root endpoint
-app.use('/api',mainRouter);
+app.use('/api', mainRouter);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL || '', {
