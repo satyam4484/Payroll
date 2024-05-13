@@ -4,11 +4,10 @@ import { useGlobalContext } from '../provider/Context'
 
 const Spinner = ({ newClass }) => {
 
-    // const { toggleSpinner, isLoading } = useGlobalContext();
-
+    const { toggleSpinner, isLoading } = useGlobalContext();
 
     return (
-        <div className='flex items-center justify-center'>
+        <div className='flex items-center justify-center h-screen'>
             <img src={spinner} className={`w-8 ${newClass}`} />
         </div>
     )

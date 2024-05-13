@@ -22,3 +22,27 @@ export const getCategoryList = () => {
 export const getCompanyList = () => {
     return axiosClient().get('company').then(response => response.data)
 }
+
+export const createNewCompany = (data) => {
+    return axiosClient().post('company', JSON.stringify(data)).then(response => response.data)
+}
+
+/* Attendance */
+
+export const getAttendanceSheet = (data) => {
+    return axiosClient().post('attendance/sheet', JSON.stringify(data)).then(response => response.data)
+}
+
+export const uploadAttendanceSheet = (data) => {
+    return axiosClient().post('attendance/mark_sheet', JSON.stringify(data)).then(response => response.data)
+}
+
+/* Payroll */
+
+export const getPayrollDetails = (data) => {
+    return axiosClient().post('payroll', JSON.stringify(data)).then(response => response.data)
+}
+
+export const payrollUpdate = (data) => {
+    return axiosClient().post('payroll', JSON.stringify(data)).then(response => response.data)
+}

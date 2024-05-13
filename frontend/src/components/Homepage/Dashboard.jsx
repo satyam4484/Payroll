@@ -30,7 +30,7 @@ const Dashboard = () => {
 
     return (
         <>
-            <div className='grid grid-cols-12 gap-4 px-5 py-5'>
+            <div className='grid grid-cols-12 gap-4 px-5 pt-5'>
 
                 <div className='col-span-2 mt-16 hidden md:block'>
                     <Sidebar setSelectedPage={setSelectedPage} />
