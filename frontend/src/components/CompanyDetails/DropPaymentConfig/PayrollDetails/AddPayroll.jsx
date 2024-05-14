@@ -8,23 +8,21 @@ import { updatePayrollDetails, addPayrollDetails } from '../../../../api/apiUrl'
 import PayrollFormat from "./PayrollViewFormat";
 import PayrollEditFormat from "./PayrollEditFormat";
 
-const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
-
-    const { HRA, Conveyance, WashingAllowance, MedicalAllowance, OtherAllowance, EmployeePF, EmployeesESIC, MLWF, PT, EmployerPF, EmployerESIC, _id } = payrollDetails;
+const AddPayroll = ({ open, handleOpen, company }) => {
 
     const [updatedItems, setUpdatedItems] = useState({});
     const [editableItems, setEditableItems] = useState({
-        HRA: { value: HRA?.value, operation: HRA?.operation },
-        Conveyance: { value: Conveyance?.value, operation: Conveyance?.operation },
-        WashingAllowance: { value: WashingAllowance?.value, operation: WashingAllowance?.operation },
-        MedicalAllowance: { value: MedicalAllowance?.value, operation: MedicalAllowance?.operation },
-        OtherAllowance: { value: OtherAllowance?.value, operation: OtherAllowance?.operation },
-        EmployeePF: { value: EmployeePF?.value?.$numberDecimal, operation: EmployeePF?.operation },
-        EmployeesESIC: { value: EmployeesESIC?.value?.$numberDecimal, operation: EmployeesESIC?.operation },
-        PT: { value: PT?.value, operation: PT?.operation },
-        MLWF: { value: MLWF?.value, operation: MLWF?.operation },
-        EmployerPF: { value: EmployerPF?.value?.$numberDecimal, operation: EmployerPF?.operation },
-        EmployerESIC: { value: EmployerESIC?.value?.$numberDecimal, operation: EmployerESIC?.operation },
+        HRA: { value: 0, operation: 0 },
+        Conveyance: { value: 0, operation: 0 },
+        WashingAllowance: { value: 0, operation: 0 },
+        MedicalAllowance: { value: 0, operation: 0 },
+        OtherAllowance: { value: 0, operation: 0 },
+        EmployeePF: { value: 0, operation: 0 },
+        EmployeesESIC: { value: 0, operation: 0 },
+        MLWF: { value: 0, operation: 0 },
+        PT: { value: 0, operation: 0 },
+        EmployerPF: { value: 0, operation: 0 },
+        EmployerESIC: { value: 0, operation: 0 },
     });
 
     // Function to toggle edit mode for a payroll item
@@ -102,12 +100,14 @@ const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
             }
         }
 
+        updatedPayrollData.type = "Company"
+        updatedPayrollData._id = company
+
         // Call the API to update the payroll data
-        updatePayrollDetails(company, updatedPayrollData).then((response) => {
+        addPayrollDetails(updatedPayrollData).then((response) => {
 
             if (response.error === false) {
-                // console.log(response.error);
-                console.log(response.updatedPayroll);
+                console.log(response);
 
                 // Reset the updated items and set isEditing to false for updated items
                 const resetUpdatedItems = {};
@@ -167,7 +167,7 @@ const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
                 className="rounded-3xl py-6"
             >
                 <DialogHeader className="flex justify-center">
-                    <span className=" plusJakartaSans uppercase">Payroll</span>
+                    <span className=" plusJakartaSans uppercase">Add Payroll</span>
                 </DialogHeader>
                 <DialogBody>
                     <div className="grid grid-cols-12 place-items-center ">
@@ -194,4 +194,4 @@ const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
     );
 };
 
-export default PayrollModal;
+export default AddPayroll;

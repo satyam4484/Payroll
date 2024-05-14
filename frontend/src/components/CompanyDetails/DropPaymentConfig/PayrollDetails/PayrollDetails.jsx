@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { getPayrollDetails } from '../../../../api/apiUrl'
 import PayrollModal from './PayrollModal'
+import AddPayroll from './AddPayroll'
 
 const PayrollDetails = () => {
 
     const companyId = localStorage.getItem('companyId')
 
     const [openPayroll, setOpenPayroll] = useState(false);
+    const [openAddPayroll, setOpenAddPayroll] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [payrollDetails, setPayrollDetails] = useState([]);
     const [isPayroll, setIsPayroll] = useState(false);
@@ -41,6 +43,13 @@ const PayrollDetails = () => {
         }
     };
 
+    const handleAddPayrollDetails = () => {
+        if (companyId) {
+            setOpenAddPayroll(true)
+            setIsPayroll(false);
+        }
+    }
+
     return (
         <>
             <button
@@ -70,8 +79,24 @@ const PayrollDetails = () => {
                 isPayroll && (
                     <div className='bg-white rounded-xl p-4 text-center space-y-3 shadow-md mx-3'>
                         <p className='text-red-400 italic text-sm'>No Payroll Found!</p>
-                        <button className='plus-jkrt font-medium shadow-md bg-green-400 text-white text-xs px-2 py-1 rounded-lg'>Add Payroll</button>
+                        <button
+                            className='plus-jkrt font-medium shadow-md bg-green-400 text-white text-xs px-2 py-1 rounded-lg'
+                            onClick={() => {
+                                handleAddPayrollDetails()
+                                handleOpen()
+                            }}
+                        >Add Payroll</button>
                     </div>
+                )
+            }
+
+            {
+                openAddPayroll && !isPayroll && (
+                    <AddPayroll
+                        open={openAddPayroll}
+                        handleOpen={() => setOpenAddPayroll(false)}
+                        company={companyId}
+                    />
                 )
             }
 

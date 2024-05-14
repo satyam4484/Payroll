@@ -355,7 +355,7 @@ const Profile = ({ user, companyDetails, onBack, formatDate }) => {
                     {/* user_roles */}
                     <ProfileForm
                         label="User Role"
-                        fieldName={user_role ? user_role === 'Employee' ? 'Supervisor' : user_role : "-"}
+                        fieldName={user_role ? user_role : "-"}
                     />
 
                     {/* contactEmail */}

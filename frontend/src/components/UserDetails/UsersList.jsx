@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { getCompanyById, getUserList, getUserProfile } from '../../api/apiUrl'
+import { getCompanyById, getPayrollDetails, getUserList, getUserProfile } from '../../api/apiUrl'
 import { Filter, SearchIcon2 } from '../../ui/Icons'
 import default_image from '../../assets/images/default_image.svg'
 import MarkAttendance from './MarkAttendance'
-import ViewPayroll from './ViewPayroll'
 import Profile from './Profile'
+import UserPayrollDetails from './UserPayroll/UserPayrollDetails'
 
 const UsersList = () => {
 
@@ -15,9 +15,18 @@ const UsersList = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [filteredSupervisors, setFilteredSupervisors] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserRole, setSelectedUserRole] = useState(null);
+
   const [showProfile, setShowProfile] = useState(false);
   const [showMarkAttendance, setShowMarkAttendance] = useState(false);
   const [showViewPayroll, setShowViewPayroll] = useState(false);
+
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [payrollDetails, setPayrollDetails] = useState([]);
+  const [isPayroll, setIsPayroll] = useState(false);
+  const [openPayroll, setOpenPayroll] = useState(false);
+
+  const userId = localStorage.getItem('userId')
 
   const fetchEmployeeData = () => {
     getUserList().then((response) => {
@@ -41,7 +50,7 @@ const UsersList = () => {
   useEffect(() => {
     const filtered = employees.filter((employee) => {
 
-      const { user_id, contact, company, name, email, date_of_birth, category, user_role } = employee;
+      const { user_id, contact, name, email, date_of_birth, company, category, user_role } = employee;
 
       // Check if any field matches the search query
       return (
@@ -49,7 +58,7 @@ const UsersList = () => {
         user_id?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         category?.category_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        company?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
+        company?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         email?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         contact?.includes(searchQuery) ||
         date_of_birth?.includes(searchQuery)
@@ -63,7 +72,7 @@ const UsersList = () => {
   useEffect(() => {
     const filtered = supervisors.filter((supervisor) => {
 
-      const { user_id, contact, company, name, email, date_of_birth, category, user_role } = supervisor;
+      const { user_id, contact, name, email, date_of_birth, company, category, user_role } = supervisor;
 
       // Check if any field matches the search query
       return (
@@ -71,7 +80,7 @@ const UsersList = () => {
         user_id?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         category?.category_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        company?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
+        company?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         email?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
         contact?.includes(searchQuery) ||
         date_of_birth?.includes(searchQuery)
@@ -88,8 +97,10 @@ const UsersList = () => {
 
       getUserProfile(userId).then((response) => {
         if (response.error === false) {
-          // console.log(response.user)
+          // console.log(response.user._id)
           setSelectedUser(response.user);
+          setSelectedUserRole(response.user.user_role);
+          localStorage.setItem('userId', response.user._id)
 
           // Fetch company details
           const companyId = response.user?.company._id
@@ -112,9 +123,12 @@ const UsersList = () => {
   // Close employee details
   const handleBackToEmployeeList = () => {
     setSelectedUser(null);
+    setSelectedUserRole(null);
     setShowProfile(false);
     setShowMarkAttendance(false);
     setShowViewPayroll(false);
+    // setDataLoaded(false)
+    // setIsPayroll(false)
     // fetchEmployeeData();
   };
 
@@ -137,13 +151,47 @@ const UsersList = () => {
     }
   }, [selectedUser]);
 
+  const handleOpen = () => {
+    setOpenPayroll(!openPayroll)
+  };
+
+  // Function to handle get Payroll Details
+  const handlePayrollDetails = () => {
+
+    if (userId) {
+      getPayrollDetails(userId).then((response) => {
+        if (response.error === false) {
+          // console.log(response)
+          setPayrollDetails(response.payroll);
+          setOpenPayroll(true);
+          setDataLoaded(true)
+          setIsPayroll(false);
+          setShowProfile(false);
+        }
+      }).catch((error) => {
+        // setError('Unable to view payroll details!')
+        // setTimeout(() => {
+        //     setError('');
+        // }, 2000);
+        // setIsPayroll(Object.keys(response.payroll).length > 0)
+        setIsPayroll(true);
+        setShowProfile(false);
+        console.log(error);
+      });
+    } else {
+      console.log('No Company ID Selected!');
+    }
+  };
+
   return (
     <div>
       {selectedUser ? (
         <>
           {showProfile && <Profile user={selectedUser} companyDetails={companyDetails} onBack={handleBackToEmployeeList} formatDate={formatDate} />}
-          {showMarkAttendance && <MarkAttendance user={selectedUser} />}
-          {showViewPayroll && <ViewPayroll />}
+
+          {showMarkAttendance && <MarkAttendance user={selectedUser} onBack={handleBackToEmployeeList} />}
+
+          {showViewPayroll && <UserPayrollDetails user={selectedUser} role={selectedUserRole} payrollDetails={payrollDetails} dataLoaded={dataLoaded} isPayroll={isPayroll} setIsPayroll={setIsPayroll} onBack={handleBackToEmployeeList} handleOpen={handleOpen} openPayroll={openPayroll} />}
         </>
       ) : (
         <>
@@ -190,7 +238,10 @@ const UsersList = () => {
                     <div
                       key={_id}
                       className='border border-[#2F80EF] rounded-[2.5rem] px-6 py-4 mb-4 w-full h-full text-xs bg-white shadow-lg cursor-pointer'
-                      onClick={() => { handleUserCardClick(item); }}
+                      onClick={() => {
+                        handleUserCardClick(item)
+                        setShowProfile(true)
+                      }}
                     >
 
                       <div className='flex justify-between items-center pb-2'>
@@ -212,19 +263,28 @@ const UsersList = () => {
                           <span className='lowercase '>{email || '-'}</span>
                         </p>
                         <p className='inter'> <span className='font-bold inter'>Company : </span>
-                          <span className='capitalize'>{company || '-'}</span>
+                          <span className='capitalize'>{company?.name || '-'}</span>
                         </p>
                         <p className='inter'> <span className='font-bold inter'>Category : </span>
                           <span className='capitalize'>{category?.category_name || '-'}</span>
                         </p>
                       </div>
+
                       <div className='flex justify-between mt-2'>
                         <button className='p-1 rounded-lg text-xs font-medium border border-lime-500 outline-none text-lime-800 hover:bg-lime-500 hover:text-white' onClick={() => setShowProfile(true)}>View Profile</button>
 
                         <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-deep-orange-400 outline-none text-deep-orange-400 hover:bg-deep-orange-400 hover:text-white' onClick={() => setShowMarkAttendance(true)}>Mark attendance</button>
 
-                        <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-indigo-400 outline-none text-indigo-400 hover:bg-indigo-400 hover:text-white' onClick={() => setShowViewPayroll(true)}>View Payroll</button>
+                        <button
+                          className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-indigo-400 outline-none text-indigo-400 hover:bg-indigo-400 hover:text-white'
+                          onClick={() => {
+                            setShowViewPayroll(true)
+                            handlePayrollDetails()
+                          }
+                          }
+                        >View Payroll</button>
                       </div>
+
                     </div>
                   )
                 })
@@ -253,7 +313,10 @@ const UsersList = () => {
                     <div
                       key={_id}
                       className='border border-[#2F80EF] rounded-[2.5rem] px-6 py-4 mb-4 w-full h-full text-xs bg-white shadow-lg cursor-pointer'
-                      onClick={() => handleUserCardClick(item)}
+                      onClick={() => {
+                        handleUserCardClick(item)
+                        setShowProfile(true)
+                      }}
                     >
 
                       <div className='flex justify-between items-center pb-2 space-x-4'>
@@ -268,11 +331,25 @@ const UsersList = () => {
                         <p className='inter'> <span className='font-bold inter'>DOB - </span>{formatDate(date_of_birth) || '-'}</p>
                         <p className='inter'> <span className='font-bold inter'>Contact No - </span> {contact || '-'}</p>
                         <p className='inter'> <span className='font-bold inter'>Email ID - </span><span className='lowercase '>{email || '-'}</span> </p>
-                        <p className='inter'> <span className='font-bold inter'>Company - </span><span className='capitalize'>{company || '-'}</span> </p>
+                        <p className='inter'> <span className='font-bold inter'>Company - </span><span className='capitalize'>{company?.name || '-'}</span> </p>
                         <p className='inter'> <span className='font-bold inter'>Category : </span>
                           <span className='capitalize'>{category?.category_name || '-'}</span>
                         </p>
                       </div>
+
+                      <div className='flex justify-between mt-2'>
+                        <button className='p-1 rounded-lg text-xs font-medium border border-lime-500 outline-none text-lime-800 hover:bg-lime-500 hover:text-white' onClick={() => setShowProfile(true)}>View Profile</button>
+
+                        <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-deep-orange-400 outline-none text-deep-orange-400 hover:bg-deep-orange-400 hover:text-white' onClick={() => setShowMarkAttendance(true)}>Mark attendance</button>
+
+                        <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-indigo-400 outline-none text-indigo-400 hover:bg-indigo-400 hover:text-white'
+                          onClick={() => {
+                            setShowViewPayroll(true)
+                            handlePayrollDetails()
+                          }
+                          }>View Payroll</button>
+                      </div>
+
                     </div>
                   )
                 })

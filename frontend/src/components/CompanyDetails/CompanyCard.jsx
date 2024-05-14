@@ -1,6 +1,7 @@
 import React from 'react'
 import { DoubleOverlappingRightArrow } from '../../ui/Icons'
 import default_image from '../../assets/images/default_image.svg'
+import default_image_2 from '../../assets/images/default.png'
 
 const CompanyCard = ({ filteredCompanies, handleCompanyCardClick }) => {
 
@@ -20,7 +21,7 @@ const CompanyCard = ({ filteredCompanies, handleCompanyCardClick }) => {
 
                             {/* Left Section */}
                             <div className='mr-3 sm:hidden md:hidden lg:block'>
-                                <img src={logo === 'https://example.com/logo.png' || '' ? default_image : logo} alt='' className='object-cover text-xs w-9 h-9 rounded-full border' />
+                                <img src={logo === 'https://example.com/logo.png' || '' ? default_image_2 : logo} alt='' className='object-cover text-xs w-9 h-9 rounded-full border' />
                             </div>
 
                             {/* Center Section */}

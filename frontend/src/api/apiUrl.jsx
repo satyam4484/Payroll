@@ -55,7 +55,7 @@ export const getTodayAttendance = (id, date) => {
 /* Payroll */
 
 export const addPayrollDetails = (data) => {
-    return axiosClient().get('payroll', JSON.stringify(data)).then(response => response.data)
+    return axiosClient().post('payroll', JSON.stringify(data)).then(response => response.data)
 }
 
 export const getPayrollDetails = (id) => {
