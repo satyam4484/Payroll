@@ -90,7 +90,7 @@ export const getUserById = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         // Fetch all users from the database
-        const users = await User.find().select('-password').populate("category");
+        const users = await User.find().select('-password').populate("category").populate("company");
         // Send a success response with the list of users
         res.status(200).json({ error: false, users });
     } catch (error) {
