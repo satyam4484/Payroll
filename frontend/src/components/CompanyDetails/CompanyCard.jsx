@@ -20,7 +20,7 @@ const CompanyCard = ({ filteredCompanies, handleCompanyCardClick }) => {
 
                             {/* Left Section */}
                             <div className='mr-3 sm:hidden md:hidden lg:block'>
-                                <img src={logo ? logo : default_image} alt='' className='object-cover text-xs w-9 h-9 rounded-full border' />
+                                <img src={logo === 'https://example.com/logo.png' || '' ? default_image : logo} alt='' className='object-cover text-xs w-9 h-9 rounded-full border' />
                             </div>
 
                             {/* Center Section */}

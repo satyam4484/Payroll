@@ -4,7 +4,7 @@ import {
     DialogHeader,
     DialogBody,
 } from "@material-tailwind/react";
-import { payrollUpdate } from '../../../../api/apiUrl'
+import { updatePayrollDetails, addPayrollDetails } from '../../../../api/apiUrl'
 import PayrollFormat from "./PayrollViewFormat";
 import PayrollEditFormat from "./PayrollEditFormat";
 
@@ -101,17 +101,13 @@ const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
                 updatedPayrollData[itemName] = { value, operation };
             }
         }
-
-        // Add type and _id to the updatedPayrollData
-        updatedPayrollData.type = 'Company';
-        updatedPayrollData._id = company;
-
+        console.log(company)
         // Call the API to update the payroll data
-        payrollUpdate(updatedPayrollData).then((response) => {
+        updatePayrollDetails(company, updatedPayrollData).then((response) => {
 
             if (response.error === false) {
                 // console.log(response.error);
-                // console.log(response.savedPayroll);
+                console.log(response.updatedPayroll);
 
                 // Reset the updated items and set isEditing to false for updated items
                 const resetUpdatedItems = {};

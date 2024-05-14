@@ -13,7 +13,7 @@ const Render = () => {
     useEffect(() => {
         if (isLoggedIn) {
             navigate('/')
-        } 
+        }
     }, []);
 
     const userLogoutHandler = () => {
@@ -27,11 +27,11 @@ const Render = () => {
     return (
         <div className='bg-gray-100 min-h-screen'>
 
-            {(userRole === 'Employee') && <Navbar />}
+            {(userRole === 'Supervisor') && <Navbar />}
 
-            {(userRole === 'Employee') && <Dashboard />}
+            {(userRole === 'Supervisor') && <Dashboard />}
 
-            {/* {userRole !== 'Employee' && (
+            {userRole === 'Employee' && (
                 <div className="flex flex-col items-center justify-center min-h-screen text-center space-y-5">
                     <p className='poppins text-xl capitalize text-red-500 font-semibold '>
                         You do not have authorization to access this page!
@@ -40,7 +40,7 @@ const Render = () => {
                         <Link to="/auth/login">Go back to Login</Link>
                     </button>
                 </div>
-            )} */}
+            )}
         </div>
     )
 }

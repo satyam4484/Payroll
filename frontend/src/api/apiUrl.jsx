@@ -47,12 +47,23 @@ export const uploadAttendanceSheet = (data) => {
     return axiosClient().post('attendance/mark_sheet', JSON.stringify(data)).then(response => response.data)
 }
 
+export const getTodayAttendance = (id, date) => {
+    return axiosClient().get(`attendance/today/${id}?date=${date}`).then(response => response.data)
+}
+
+
 /* Payroll */
 
-export const getPayrollDetails = (data) => {
-    return axiosClient().post('payroll', JSON.stringify(data)).then(response => response.data)
+export const addPayrollDetails = (data) => {
+    return axiosClient().get('payroll', JSON.stringify(data)).then(response => response.data)
 }
 
-export const payrollUpdate = (data) => {
-    return axiosClient().post('payroll', JSON.stringify(data)).then(response => response.data)
+export const getPayrollDetails = (id) => {
+    return axiosClient().get(`payroll/${id}`).then(response => response.data)
 }
+
+export const updatePayrollDetails = (id, data) => {
+    return axiosClient().put(`payroll/${id}`, JSON.stringify(data)).then(response => response.data)
+}
+
+/* File Upload */
