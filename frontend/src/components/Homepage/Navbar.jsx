@@ -18,7 +18,7 @@ const Navbar = () => {
 
 
     let name = userCred?.name ? userCred?.name : 'Guest';
-    let profilePic = userCred?.profile_pic ? userCred?.profile_pic : default_image;
+    let profilePic = userCred?.profile_pic === 'profile_pic_url' || userCred?.profile_pic === '' ? default_image : userCred?.profile_pic;
 
     const navigate = useNavigate();
 

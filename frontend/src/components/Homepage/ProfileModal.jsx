@@ -29,7 +29,7 @@ const ProfileModal = ({ open, handleOpen }) => {
         user_role: userRole,
     } = userCred;
 
-    const profilePic = userProfilePic ? userProfilePic : default_image;
+    const profilePic = userProfilePic === 'profile_pic_url' || userProfilePic === '' ? default_image : userProfilePic;
 
     return (
         <>

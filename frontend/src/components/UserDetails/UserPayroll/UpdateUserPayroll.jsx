@@ -1,14 +1,10 @@
 import React, { useState } from "react";
-import {
-    Dialog,
-    DialogHeader,
-    DialogBody,
-} from "@material-tailwind/react";
-import { updatePayrollDetails, addPayrollDetails } from '../../../../api/apiUrl'
-import PayrollFormat from "./PayrollViewFormat";
-import PayrollEditFormat from "./PayrollEditFormat";
+import { updatePayrollDetails, addPayrollDetails } from '../../../api/apiUrl'
+import PayrollFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollViewFormat";
+import PayrollEditFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollEditFormat";
+import { CrossIcon } from "../../../ui/Icons";
 
-const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
+const UpdateUserPayroll = ({ payrollDetails, user, onClose }) => {
 
     const { HRA, Conveyance, WashingAllowance, MedicalAllowance, OtherAllowance, EmployeePF, EmployeesESIC, MLWF, PT, EmployerPF, EmployerESIC, _id } = payrollDetails;
 
@@ -103,11 +99,12 @@ const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
         }
 
         // Call the API to update the payroll data
-        updatePayrollDetails(company, updatedPayrollData).then((response) => {
+        updatePayrollDetails(user, updatedPayrollData).then((response) => {
 
             if (response.error === false) {
                 // console.log(response.error);
-                console.log(response.updatedPayroll);
+                // console.log(response.updatedPayroll);
+                console.log("Payroll Updated!")
 
                 // Reset the updated items and set isEditing to false for updated items
                 const resetUpdatedItems = {};
@@ -160,38 +157,41 @@ const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
 
     return (
         <>
-            <Dialog
-                size="lg"
-                open={open}
-                handler={handleOpen}
-                className="rounded-3xl py-6"
-            >
-                <DialogHeader className="flex justify-center">
-                    <span className=" plusJakartaSans uppercase">Payroll</span>
-                </DialogHeader>
-                <DialogBody>
-                    <div className="grid grid-cols-12 place-items-center ">
-                        <div className="md:col-span-6 sm:col-span-12">
-                            {renderPayrollItem("HRA", editableItems.HRA)}
-                            {renderPayrollItem("Conveyance", editableItems.Conveyance)}
-                            {renderPayrollItem("Medical Allowance", editableItems.MedicalAllowance)}
-                            {renderPayrollItem("Washing Allowance", editableItems.WashingAllowance)}
-                            {renderPayrollItem("Other Allowance", editableItems.OtherAllowance)}
-                            {renderPayrollItem("PT", editableItems.PT)}
-                        </div>
+            <div className="flex items-center justify-center">
+                <p className="text-2xl font-bold plusJakartaSans uppercase">Payroll</p>
+            </div>
 
-                        <div className="md:col-span-6 sm:col-span-12">
-                            {renderPayrollItem("Employee PF", editableItems.EmployeePF)}
-                            {renderPayrollItem("Employees ESIC", editableItems.EmployeesESIC)}
-                            {renderPayrollItem("Employer PF", editableItems.EmployerPF)}
-                            {renderPayrollItem("Employer ESIC", editableItems.EmployerESIC)}
-                            {renderPayrollItem("MLWF", editableItems.MLWF)}
-                        </div>
+            <div className="flex items-center justify-end">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="float-end p-3 hover:shadow-md hover:rounded-full hover:bg-white"
+                >
+                    <CrossIcon />
+                </button>
+            </div>
+            <div>
+                <div className="grid grid-cols-12 place-items-center ">
+                    <div className="md:col-span-6 sm:col-span-12">
+                        {renderPayrollItem("HRA", editableItems.HRA)}
+                        {renderPayrollItem("Conveyance", editableItems.Conveyance)}
+                        {renderPayrollItem("Medical Allowance", editableItems.MedicalAllowance)}
+                        {renderPayrollItem("Washing Allowance", editableItems.WashingAllowance)}
+                        {renderPayrollItem("Other Allowance", editableItems.OtherAllowance)}
+                        {renderPayrollItem("PT", editableItems.PT)}
                     </div>
-                </DialogBody>
-            </Dialog>
+
+                    <div className="md:col-span-6 sm:col-span-12">
+                        {renderPayrollItem("Employee PF", editableItems.EmployeePF)}
+                        {renderPayrollItem("Employees ESIC", editableItems.EmployeesESIC)}
+                        {renderPayrollItem("Employer PF", editableItems.EmployerPF)}
+                        {renderPayrollItem("Employer ESIC", editableItems.EmployerESIC)}
+                        {renderPayrollItem("MLWF", editableItems.MLWF)}
+                    </div>
+                </div>
+            </div>
         </>
     );
 };
 
-export default PayrollModal;
+export default UpdateUserPayroll;

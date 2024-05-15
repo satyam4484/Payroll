@@ -3,7 +3,7 @@ import Sidebar from './Sidebar';
 import CreateUser from '../User/CreateUser';
 import CreateCompany from '../Company/CreateCompany';
 import CompanyList from '../CompanyDetails/CompanyList';
-import UserDetails from '../UserDetails/UserDetails';
+import UsersList from '../UserDetails/UsersList';
 
 const Dashboard = () => {
 
@@ -19,7 +19,7 @@ const Dashboard = () => {
             case 'CompanyList':
                 return <CompanyList />;
             case 'UserDetails':
-                return <UserDetails />;
+                return <UsersList />;
             default:
                 return null
 
