@@ -1,11 +1,18 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getPayrollDetails } from '../../../../api/apiUrl'
 import PayrollModal from './PayrollModal'
 import AddPayroll from './AddPayroll'
 
-const PayrollDetails = () => {
+const PayrollDetails = ({ companyProps }) => {
 
-    const companyId = localStorage.getItem('companyId')
+    // console.log("company ID: ", companyProps._id)
+    // console.log("company payroll: ", companyProps.payroll)
+    const { _id, payroll } = companyProps
+
+    if (payroll) {
+        localStorage.removeItem('payrollId')
+    }
+    const newPayrollId = localStorage.getItem('payrollId')
 
     const [openPayroll, setOpenPayroll] = useState(false);
     const [openAddPayroll, setOpenAddPayroll] = useState(false);
@@ -19,9 +26,8 @@ const PayrollDetails = () => {
 
     // Function to handle get Payroll Details
     const handlePayrollDetails = () => {
-        if (companyId) {
-            // companyId = 66422d361463bc4e80d0deac
-            getPayrollDetails(companyId).then((response) => {
+        if (_id && payroll ? payroll : newPayrollId) {
+            getPayrollDetails(payroll ? payroll : newPayrollId).then((response) => {
                 if (response.error === false) {
                     // console.log(response.payroll)
                     setPayrollDetails(response.payroll);
@@ -35,16 +41,22 @@ const PayrollDetails = () => {
                 //     setError('');
                 // }, 2000);
                 // setIsPayroll(Object.keys(response.payroll).length > 0)
+                setOpenPayroll(false);
+                setDataLoaded(false)
                 setIsPayroll(true);
                 console.log(error);
             });
         } else {
+            setOpenPayroll(false);
+            setDataLoaded(false)
+            setIsPayroll(true);
             console.log('No Company ID Selected!');
+            console.log('No Payroll Found!');
         }
     };
 
     const handleAddPayrollDetails = () => {
-        if (companyId) {
+        if (_id) {
             setOpenAddPayroll(true)
             setIsPayroll(false);
         }
@@ -70,13 +82,13 @@ const PayrollDetails = () => {
                         open={openPayroll}
                         handleOpen={() => setOpenPayroll(false)}
                         payrollDetails={payrollDetails}
-                        company={companyId}
+                        payrollId={payroll}
                     />
                 )
             }
 
             {
-                isPayroll && (
+                isPayroll && openPayroll && (
                     <div className='bg-white rounded-xl p-4 text-center space-y-3 shadow-md mx-3'>
                         <p className='text-red-400 italic text-sm'>No Payroll Found!</p>
                         <button
@@ -95,7 +107,7 @@ const PayrollDetails = () => {
                     <AddPayroll
                         open={openAddPayroll}
                         handleOpen={() => setOpenAddPayroll(false)}
-                        company={companyId}
+                        company={_id}
                     />
                 )
             }

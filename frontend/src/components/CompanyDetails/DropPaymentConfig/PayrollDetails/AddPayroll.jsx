@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Dialog,
     DialogHeader,
     DialogBody,
 } from "@material-tailwind/react";
-import { updatePayrollDetails, addPayrollDetails } from '../../../../api/apiUrl'
-import PayrollFormat from "./PayrollViewFormat";
-import PayrollEditFormat from "./PayrollEditFormat";
+import { addPayrollDetails } from '../../../../api/apiUrl'
 
 const AddPayroll = ({ open, handleOpen, company }) => {
 
-    const [updatedItems, setUpdatedItems] = useState({});
+    // console.log(company)
+
+    const [newPayrollId, setNewPayrollId] = useState('')
+    const [isEditing, setIsEditing] = useState(false)
     const [editableItems, setEditableItems] = useState({
         HRA: { value: 0, operation: 0 },
         Conveyance: { value: 0, operation: 0 },
@@ -25,31 +26,14 @@ const AddPayroll = ({ open, handleOpen, company }) => {
         EmployerESIC: { value: 0, operation: 0 },
     });
 
-    // Function to toggle edit mode for a payroll item
-    const toggleEditMode = (itemName) => {
-        setEditableItems((prevState) => ({
-            ...prevState,
-            [itemName]: {
-                ...prevState[itemName],
-                isEditing: !prevState[itemName]?.isEditing,
-            },
-        }));
-    };
-
     // Function to handle value change for a payroll item
     const handleValueChange = (itemName, newValue) => {
-
         setEditableItems((prevState) => ({
             ...prevState,
             [itemName]: {
                 ...prevState[itemName],
                 value: parseInt(newValue),
             },
-        }));
-
-        setUpdatedItems((prevUpdatedItems) => ({
-            ...prevUpdatedItems,
-            [itemName]: true,
         }));
     };
 
@@ -82,78 +66,95 @@ const AddPayroll = ({ open, handleOpen, company }) => {
         }
     };
 
+    const operationOptions = [
+        { value: 0, label: "+" },
+        { value: -1, label: "-" },
+        { value: 1, label: "x" },
+        { value: 2, label: "/" },
+        { value: 3, label: "%" },
+    ];
+
     // Function to handle the "Save" button click
-    const handleSaveClick = (name) => {
-        toggleEditMode(name)
-
-        const updatedPayrollData = {};
-
-        // Filter out only the updated items
-        for (const itemName in updatedItems) {
-            if (updatedItems[itemName]) {
-                let { value, operation } = editableItems[itemName];
-
-                if (value === "" || value === null || isNaN(value)) {
-                    value = 0;
-                }
-                updatedPayrollData[itemName] = { value, operation };
-            }
-        }
-
-        updatedPayrollData.type = "Company"
-        updatedPayrollData._id = company
+    const handleSubmit = () => {
+        setIsEditing(false)
+        editableItems.type = "company"
+        editableItems._id = company
 
         // Call the API to update the payroll data
-        addPayrollDetails(updatedPayrollData).then((response) => {
-
+        addPayrollDetails(editableItems).then((response) => {
             if (response.error === false) {
-                console.log(response);
+                // console.log(response.savedPayroll);
+                // setNewPayrollId(response.savedPayroll._id)
+                localStorage.setItem('payrollId', response.savedPayroll._id)
 
-                // Reset the updated items and set isEditing to false for updated items
-                const resetUpdatedItems = {};
-                for (const itemName in updatedItems) {
-                    resetUpdatedItems[itemName] = false;
-                }
+                setTimeout(() => {
+                    localStorage.removeItem('payrollId')
+                }, 60000) // 1 min
 
-                setUpdatedItems(resetUpdatedItems);
+                setIsEditing(true)
+                console.log("Payroll Added Successfully!");
             }
         }).catch((error) => {
+            setIsEditing(false)
             console.log(error);
         });
-    };
+    }
 
     // Define a function to render payroll items with symbols
     const renderPayrollItem = (name, itemData) => {
 
         const itemNameWithoutSpaces = name.replace(/\s/g, '');
         const symbol = renderMathSymbol(itemData?.operation);
-        const isEditing = itemData?.isEditing;
 
         return (
             <div className="my-3">
+                {
+                    isEditing ? (
+                        <>
+                            <div className="flex justify-between">
+                                <p className="text-gray-500 font-normal text-sm plusJakartaSans mb-1">
+                                    {name}
+                                </p>
+                            </div>
+                            <div className="flex items-center px-4 justify-between border rounded-lg w-[20.4375rem] h-11 bg-gray-200 shadow-gray-400 shadow-md">
+                                <p className="text-gray-700 font-medium plusJakartaSans">
+                                    {itemData?.value}
+                                </p>
+                                <p className="text-gray-700 font-medium plusJakartaSans">
+                                    {symbol}
+                                </p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="flex justify-between">
+                                <p className="text-gray-500 font-normal text-sm  plusJakartaSans mb-1">
+                                    {name}
+                                </p>
+                            </div>
+                            <div className="flex items-center px-4 justify-between border rounded-lg w-[20.4375rem] h-11 bg-gray-200 shadow-gray-400 shadow-md">
+                                <input
+                                    type="number"
+                                    className="text-gray-700 font-medium plusJakartaSans w-24 outline-none border-b border-black bg-gray-200"
+                                    value={itemData?.value}
+                                    onChange={(e) => handleValueChange(itemNameWithoutSpaces, e.target.value)}
+                                />
 
-                {isEditing ? (
-                    <>
-                        <PayrollEditFormat
-                            name={name}
-                            onClickSave={() => handleSaveClick(itemNameWithoutSpaces)}
-                            itemDataValue={itemData?.value}
-                            onChangeValue={(e) => handleValueChange(itemNameWithoutSpaces, e.target.value)}
-                            onChangeOperation={(e) => handleOperationChange(itemNameWithoutSpaces, e.target.value)}
-                            itemDataOperation={itemData?.operation}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <PayrollFormat
-                            name={name}
-                            onClickEdit={() => toggleEditMode(itemNameWithoutSpaces)}
-                            itemDataValue={itemData?.value}
-                            symbol={symbol}
-                        />
-                    </>
-
-                )}
+                                <select
+                                    value={itemData?.operation}
+                                    onChange={(e) => handleOperationChange(itemNameWithoutSpaces, e.target.value)}
+                                    className="text-gray-700 text-center font-medium plusJakartaSans w-10 outline-none border-b border-black bg-gray-200"
+                                >
+                                    {operationOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </>
+                    )
+                }
             </div>
         );
     };
@@ -166,8 +167,11 @@ const AddPayroll = ({ open, handleOpen, company }) => {
                 handler={handleOpen}
                 className="rounded-3xl py-6"
             >
-                <DialogHeader className="flex justify-center">
+                <DialogHeader className="flex justify-around">
                     <span className=" plusJakartaSans uppercase">Add Payroll</span>
+                    <button onClick={handleSubmit} className='border border-green-500 focus:shadow-none hover:bg-green-500 hover:text-white font-normal px-3 py-1 text-sm rounded-lg shadow-md disabled:cursor-not-allowed disabled:bg-green-500 disabled:text-white' disabled={isEditing}>
+                        {isEditing ? 'Done' : 'Submit'}
+                    </button>
                 </DialogHeader>
                 <DialogBody>
                     <div className="grid grid-cols-12 place-items-center ">
@@ -188,6 +192,7 @@ const AddPayroll = ({ open, handleOpen, company }) => {
                             {renderPayrollItem("MLWF", editableItems.MLWF)}
                         </div>
                     </div>
+
                 </DialogBody>
             </Dialog>
         </>

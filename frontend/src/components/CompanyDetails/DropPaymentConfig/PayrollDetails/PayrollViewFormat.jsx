@@ -1,6 +1,6 @@
 import React from 'react'
 
-const PayrollFormat = ({ name, onClickEdit, itemDataValue, symbol }) => {
+const PayrollViewFormat = ({ name, onClickEdit, itemDataValue, symbol }) => {
     return (
         <>
             <div className="flex justify-between">
@@ -26,4 +26,4 @@ const PayrollFormat = ({ name, onClickEdit, itemDataValue, symbol }) => {
     )
 }
 
-export default PayrollFormat
+export default PayrollViewFormat
