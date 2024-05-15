@@ -37,9 +37,16 @@ const CompanyList = () => {
                 // console.log(response.company)
                 localStorage.setItem('companyId', response.company._id)
                 setSelectedCompany(response.company);
+                localStorage.removeItem('payrollId')
             }
+        }).catch((error) => {
+            console.log(error)
         })
     }
+
+    // useEffect(() => {
+    //     handleCompanyCardClick()
+    // }, [handleCompanyCardClick])
 
     return (
         <div>
@@ -83,7 +90,7 @@ const CompanyList = () => {
                 </div>
 
                 {
-                    selectedCompany  &&
+                    selectedCompany &&
                     <>
                         <div className='col-span-4 w-full '>
                             {/* Employee Details */}

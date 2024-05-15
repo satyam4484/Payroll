@@ -8,7 +8,7 @@ import { updatePayrollDetails, addPayrollDetails } from '../../../../api/apiUrl'
 import PayrollFormat from "./PayrollViewFormat";
 import PayrollEditFormat from "./PayrollEditFormat";
 
-const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
+const PayrollModal = ({ open, handleOpen, payrollDetails, payrollId }) => {
 
     const { HRA, Conveyance, WashingAllowance, MedicalAllowance, OtherAllowance, EmployeePF, EmployeesESIC, MLWF, PT, EmployerPF, EmployerESIC, _id } = payrollDetails;
 
@@ -103,11 +103,11 @@ const PayrollModal = ({ open, handleOpen, payrollDetails, company }) => {
         }
 
         // Call the API to update the payroll data
-        updatePayrollDetails(company, updatedPayrollData).then((response) => {
+        updatePayrollDetails(payrollId, updatedPayrollData).then((response) => {
 
             if (response.error === false) {
                 // console.log(response.error);
-                console.log(response.updatedPayroll);
+                // console.log(response.updatedPayroll);
 
                 // Reset the updated items and set isEditing to false for updated items
                 const resetUpdatedItems = {};

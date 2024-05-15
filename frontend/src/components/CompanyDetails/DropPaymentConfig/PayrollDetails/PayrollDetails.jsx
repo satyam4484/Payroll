@@ -1,13 +1,18 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getPayrollDetails } from '../../../../api/apiUrl'
 import PayrollModal from './PayrollModal'
 import AddPayroll from './AddPayroll'
 
 const PayrollDetails = ({ companyProps }) => {
 
-    console.log("company ID: ", companyProps._id)
-    console.log("company payroll: ", companyProps.payroll)
+    // console.log("company ID: ", companyProps._id)
+    // console.log("company payroll: ", companyProps.payroll)
     const { _id, payroll } = companyProps
+
+    if (payroll) {
+        localStorage.removeItem('payrollId')
+    }
+    const newPayrollId = localStorage.getItem('payrollId')
 
     const [openPayroll, setOpenPayroll] = useState(false);
     const [openAddPayroll, setOpenAddPayroll] = useState(false);
@@ -21,8 +26,8 @@ const PayrollDetails = ({ companyProps }) => {
 
     // Function to handle get Payroll Details
     const handlePayrollDetails = () => {
-        if (_id && payroll) {
-            getPayrollDetails(payroll).then((response) => {
+        if (_id && payroll ? payroll : newPayrollId) {
+            getPayrollDetails(payroll ? payroll : newPayrollId).then((response) => {
                 if (response.error === false) {
                     // console.log(response.payroll)
                     setPayrollDetails(response.payroll);
@@ -36,12 +41,17 @@ const PayrollDetails = ({ companyProps }) => {
                 //     setError('');
                 // }, 2000);
                 // setIsPayroll(Object.keys(response.payroll).length > 0)
+                setOpenPayroll(false);
+                setDataLoaded(false)
                 setIsPayroll(true);
                 console.log(error);
             });
         } else {
+            setOpenPayroll(false);
+            setDataLoaded(false)
             setIsPayroll(true);
             console.log('No Company ID Selected!');
+            console.log('No Payroll Found!');
         }
     };
 
@@ -72,13 +82,13 @@ const PayrollDetails = ({ companyProps }) => {
                         open={openPayroll}
                         handleOpen={() => setOpenPayroll(false)}
                         payrollDetails={payrollDetails}
-                        company={payroll}
+                        payrollId={payroll}
                     />
                 )
             }
 
             {
-                isPayroll && (
+                isPayroll && openPayroll && (
                     <div className='bg-white rounded-xl p-4 text-center space-y-3 shadow-md mx-3'>
                         <p className='text-red-400 italic text-sm'>No Payroll Found!</p>
                         <button
