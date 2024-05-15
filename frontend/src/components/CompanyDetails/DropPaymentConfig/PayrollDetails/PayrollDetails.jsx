@@ -3,9 +3,11 @@ import { getPayrollDetails } from '../../../../api/apiUrl'
 import PayrollModal from './PayrollModal'
 import AddPayroll from './AddPayroll'
 
-const PayrollDetails = () => {
+const PayrollDetails = ({ companyProps }) => {
 
-    const companyId = localStorage.getItem('companyId')
+    console.log("company ID: ", companyProps._id)
+    console.log("company payroll: ", companyProps.payroll)
+    const { _id, payroll } = companyProps
 
     const [openPayroll, setOpenPayroll] = useState(false);
     const [openAddPayroll, setOpenAddPayroll] = useState(false);
@@ -19,9 +21,8 @@ const PayrollDetails = () => {
 
     // Function to handle get Payroll Details
     const handlePayrollDetails = () => {
-        if (companyId) {
-            // companyId = 66422d361463bc4e80d0deac
-            getPayrollDetails(companyId).then((response) => {
+        if (_id && payroll) {
+            getPayrollDetails(payroll).then((response) => {
                 if (response.error === false) {
                     // console.log(response.payroll)
                     setPayrollDetails(response.payroll);
@@ -39,12 +40,13 @@ const PayrollDetails = () => {
                 console.log(error);
             });
         } else {
+            setIsPayroll(true);
             console.log('No Company ID Selected!');
         }
     };
 
     const handleAddPayrollDetails = () => {
-        if (companyId) {
+        if (_id) {
             setOpenAddPayroll(true)
             setIsPayroll(false);
         }
@@ -70,7 +72,7 @@ const PayrollDetails = () => {
                         open={openPayroll}
                         handleOpen={() => setOpenPayroll(false)}
                         payrollDetails={payrollDetails}
-                        company={companyId}
+                        company={payroll}
                     />
                 )
             }
@@ -95,7 +97,7 @@ const PayrollDetails = () => {
                     <AddPayroll
                         open={openAddPayroll}
                         handleOpen={() => setOpenAddPayroll(false)}
-                        company={companyId}
+                        company={_id}
                     />
                 )
             }

@@ -10,6 +10,8 @@ import PayrollEditFormat from "./PayrollEditFormat";
 
 const AddPayroll = ({ open, handleOpen, company }) => {
 
+    console.log(company)
+
     const [updatedItems, setUpdatedItems] = useState({});
     const [editableItems, setEditableItems] = useState({
         HRA: { value: 0, operation: 0 },
@@ -107,7 +109,8 @@ const AddPayroll = ({ open, handleOpen, company }) => {
         addPayrollDetails(updatedPayrollData).then((response) => {
 
             if (response.error === false) {
-                console.log(response);
+                console.log(response.savedPayroll);
+                console.log(response.savedPayroll._id);
 
                 // Reset the updated items and set isEditing to false for updated items
                 const resetUpdatedItems = {};

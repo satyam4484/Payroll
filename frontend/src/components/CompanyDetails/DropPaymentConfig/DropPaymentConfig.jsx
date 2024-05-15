@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { ArrowDownIcon, DoubleArrowDropdownIcon } from '../../../ui/Icons'
 import PayrollDetails from './PayrollDetails/PayrollDetails'
 
-const DropPaymentConfig = ({ message, setMessage, selectedCompanyId }) => {
+const DropPaymentConfig = ({ message, setMessage, company }) => {
 
     const [isPaymentConfigurationOpen, setIsPaymentConfigurationOpen] = useState(false);
 
@@ -27,7 +27,7 @@ const DropPaymentConfig = ({ message, setMessage, selectedCompanyId }) => {
                 <div className='mt-6 mx-3'>
 
                     {/* Payroll Details */}
-                    <PayrollDetails selectedCompanyId={selectedCompanyId} />
+                    <PayrollDetails companyProps={company} />
 
                 </div>
             )}
