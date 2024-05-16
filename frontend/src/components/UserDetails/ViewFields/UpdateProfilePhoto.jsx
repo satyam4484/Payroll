@@ -34,8 +34,9 @@ const UpdateProfilePhoto = ({ profileFileUrl, setProfileFileUrl, isEditMode }) =
                 },
             });
 
-            console.log(response.message)
-            setProfileFileUrl(response.data.data)
+            // console.log(response.data.s3FileUrl)
+            console.log("File Uploaded Successfully!")
+            setProfileFileUrl(response.data.s3FileUrl)
 
 
         } catch (error) {

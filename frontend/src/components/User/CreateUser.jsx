@@ -72,25 +72,26 @@ const CreateUser = () => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post(`${BASE_URL}file/upload/`,
+            const response = await axios.post(`${BASE_URL}file/upload/Employee`,
                 formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
-            console.log(response.data.message)
+            // console.log(response.data.s3FileUrl)
+            console.log("File Uploaded Successfully!")
 
             if (name === 'aadharCardPhoto') {
-                setAadharFileUrl(response.data.data)
+                setAadharFileUrl(response.data.s3FileUrl)
             } else if (name === 'panCardPhoto') {
-                setPanFileUrl(response.data.data)
+                setPanFileUrl(response.data.s3FileUrl)
             } else if (name === 'pfPhoto') {
-                setPfFileUrl(response.data.data)
+                setPfFileUrl(response.data.s3FileUrl)
             } else if (name === 'esicPhoto') {
-                setEsicFileUrl(response.data.data)
+                setEsicFileUrl(response.data.s3FileUrl)
             } else if (name === 'profilePhoto') {
-                setProfileFileUrl(response.data.data)
+                setProfileFileUrl(response.data.s3FileUrl)
             } else {
                 console.log('No file url found!')
             }
@@ -119,10 +120,6 @@ const CreateUser = () => {
 
     const handleSelectFileProfile = () => {
         profileInputRef.current.click();
-    };
-
-    const handleRoleChange = (e) => {
-        setSelectedRole(e.target.value);
     };
 
     // Create state variables to store form data
@@ -180,6 +177,15 @@ const CreateUser = () => {
         setFormData({
             ...formData,
             company: companyId,
+        });
+    };
+
+    const handleRoleChange = (e) => {
+        // setSelectedRole(e.target.value);
+        const role = e.target.value;
+        setFormData({
+            ...formData,
+            userRole: role,
         });
     };
 
@@ -256,7 +262,6 @@ const CreateUser = () => {
         setProfileFileUrl('')
     };
 
-
     // Function to handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -266,7 +271,7 @@ const CreateUser = () => {
             return;
         }
 
-        // setIsSubmitting(true)
+        setIsSubmitting(true)
 
         // Create a function to format the common data
         const commonData = {
@@ -294,10 +299,10 @@ const CreateUser = () => {
             un_no: formData.unNumber || '',
             category: formData.category,
             company: formData.company,
-            user_role: formData.userRole,
+            user_role: formData.userRole || '',
         };
 
-        console.log(commonData)
+        // console.log(commonData)
 
         // Signup - create new user
         createNewUser(commonData).then((responseSignup) => {
@@ -386,7 +391,8 @@ const CreateUser = () => {
 
                     <select
                         name="userRole"
-                        value={selectedRole}
+                        id="userRole"
+                        value={formData.userRole}
                         onChange={handleRoleChange}
                         className="py-4 pl-3 pr-11 w-80 text-base rounded-lg bg-transparent border border-gray-400 focus:border-blue-400 focus:outline-none focus:ring-0"
                     >
@@ -435,7 +441,7 @@ const CreateUser = () => {
                     <button
                         type='submit'
                         className='rounded-3xl plus-jkrt shadow-lg text-white bg-[#24B6E9] hover:bg-[#27c0f8] py-2 px-3 w-72 disabled:bg-[#23B0E2]/50 disabled:cursor-not-allowed'
-                    // disabled={!isFormValid || isSubmitting}
+                        disabled={!isFormValid || isSubmitting}
                     >
                         Submit
                     </button>

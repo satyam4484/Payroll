@@ -4,9 +4,10 @@ import { addPayrollDetails } from '../../../api/apiUrl'
 import PayrollFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollViewFormat";
 import PayrollEditFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollEditFormat";
 
-const AddUserPayroll = ({ user, onClose, userRole }) => {
+const AddUserPayroll = ({ user, onClose }) => {
 
-    const [updatedItems, setUpdatedItems] = useState({});
+    const [newPayrollId, setNewPayrollId] = useState('')
+    const [isEditing, setIsEditing] = useState(false)
     const [editableItems, setEditableItems] = useState({
         HRA: { value: 0, operation: 0 },
         Conveyance: { value: 0, operation: 0 },
@@ -21,31 +22,14 @@ const AddUserPayroll = ({ user, onClose, userRole }) => {
         EmployerESIC: { value: 0, operation: 0 },
     });
 
-    // Function to toggle edit mode for a payroll item
-    const toggleEditMode = (itemName) => {
-        setEditableItems((prevState) => ({
-            ...prevState,
-            [itemName]: {
-                ...prevState[itemName],
-                isEditing: !prevState[itemName]?.isEditing,
-            },
-        }));
-    };
-
     // Function to handle value change for a payroll item
     const handleValueChange = (itemName, newValue) => {
-
         setEditableItems((prevState) => ({
             ...prevState,
             [itemName]: {
                 ...prevState[itemName],
                 value: parseInt(newValue),
             },
-        }));
-
-        setUpdatedItems((prevUpdatedItems) => ({
-            ...prevUpdatedItems,
-            [itemName]: true,
         }));
     };
 
@@ -78,43 +62,36 @@ const AddUserPayroll = ({ user, onClose, userRole }) => {
         }
     };
 
+    const operationOptions = [
+        { value: 0, label: "+" },
+        { value: -1, label: "-" },
+        { value: 1, label: "x" },
+        { value: 2, label: "/" },
+        { value: 3, label: "%" },
+    ];
+
     // Function to handle the "Save" button click
-    const handleSaveClick = (name) => {
-        toggleEditMode(name)
+    const handleSubmit = (name) => {
+        setIsEditing(false)
 
-        const updatedPayrollData = {};
-
-        // Filter out only the updated items
-        for (const itemName in updatedItems) {
-            if (updatedItems[itemName]) {
-                let { value, operation } = editableItems[itemName];
-
-                if (value === "" || value === null || isNaN(value)) {
-                    value = 0;
-                }
-                updatedPayrollData[itemName] = { value, operation };
-            }
-        }
-
-        updatedPayrollData.type = userRole
-        updatedPayrollData._id = user
+        editableItems.type = "Employee"
+        editableItems._id = user
 
         // Call the API to update the payroll data
-        addPayrollDetails(updatedPayrollData).then((response) => {
-
+        addPayrollDetails(editableItems).then((response) => {
             if (response.error === false) {
                 // console.log(response);
-                console.log("Payroll New Added!")
+                localStorage.setItem('userPayrollId', response.savedPayroll._id)
 
-                // Reset the updated items and set isEditing to false for updated items
-                const resetUpdatedItems = {};
-                for (const itemName in updatedItems) {
-                    resetUpdatedItems[itemName] = false;
-                }
+                setTimeout(() => {
+                    localStorage.removeItem('userPayrollId')
+                }, 60000) // 1 min
 
-                setUpdatedItems(resetUpdatedItems);
+                setIsEditing(true)
+                console.log("Payroll Added Successfully!");
             }
         }).catch((error) => {
+            setIsEditing(false)
             console.log(error);
         });
     };
@@ -124,41 +101,68 @@ const AddUserPayroll = ({ user, onClose, userRole }) => {
 
         const itemNameWithoutSpaces = name.replace(/\s/g, '');
         const symbol = renderMathSymbol(itemData?.operation);
-        const isEditing = itemData?.isEditing;
 
         return (
             <div className="my-3">
 
-                {isEditing ? (
-                    <>
-                        <PayrollEditFormat
-                            name={name}
-                            onClickSave={() => handleSaveClick(itemNameWithoutSpaces)}
-                            itemDataValue={itemData?.value}
-                            onChangeValue={(e) => handleValueChange(itemNameWithoutSpaces, e.target.value)}
-                            onChangeOperation={(e) => handleOperationChange(itemNameWithoutSpaces, e.target.value)}
-                            itemDataOperation={itemData?.operation}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <PayrollFormat
-                            name={name}
-                            onClickEdit={() => toggleEditMode(itemNameWithoutSpaces)}
-                            itemDataValue={itemData?.value}
-                            symbol={symbol}
-                        />
-                    </>
+                {
+                    isEditing ? (
+                        <>
+                            <div className="flex justify-between">
+                                <p className="text-gray-500 font-normal text-sm plusJakartaSans mb-1">
+                                    {name}
+                                </p>
+                            </div>
+                            <div className="flex items-center px-4 justify-between border rounded-lg w-[20.4375rem] h-11 bg-gray-200 shadow-gray-400 shadow-md">
+                                <p className="text-gray-700 font-medium plusJakartaSans">
+                                    {itemData?.value}
+                                </p>
+                                <p className="text-gray-700 font-medium plusJakartaSans">
+                                    {symbol}
+                                </p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="flex justify-between">
+                                <p className="text-gray-500 font-normal text-sm  plusJakartaSans mb-1">
+                                    {name}
+                                </p>
+                            </div>
+                            <div className="flex items-center px-4 justify-between border rounded-lg w-[20.4375rem] h-11 bg-gray-200 shadow-gray-400 shadow-md">
+                                <input
+                                    type="number"
+                                    className="text-gray-700 font-medium plusJakartaSans w-24 outline-none border-b border-black bg-gray-200"
+                                    value={itemData?.value}
+                                    onChange={(e) => handleValueChange(itemNameWithoutSpaces, e.target.value)}
+                                />
 
-                )}
+                                <select
+                                    value={itemData?.operation}
+                                    onChange={(e) => handleOperationChange(itemNameWithoutSpaces, e.target.value)}
+                                    className="text-gray-700 text-center font-medium plusJakartaSans w-10 outline-none border-b border-black bg-gray-200"
+                                >
+                                    {operationOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </>
+                    )
+                }
             </div>
         );
     };
 
     return (
         <>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-around">
                 <p className="text-2xl font-bold plusJakartaSans uppercase">Add Payroll</p>
+                <button onClick={handleSubmit} className='border border-green-500 focus:shadow-none hover:bg-green-500 hover:text-white font-normal px-3 py-1 text-sm rounded-lg shadow-md disabled:cursor-not-allowed disabled:bg-green-500 disabled:text-white' disabled={isEditing}>
+                    {isEditing ? 'Done' : 'Submit'}
+                </button>
             </div>
             <div className="flex items-center justify-end">
                 <button

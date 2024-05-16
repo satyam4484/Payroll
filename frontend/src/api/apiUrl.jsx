@@ -15,6 +15,10 @@ export const createNewUser = (data) => {
     return axiosClient().post('user', JSON.stringify(data)).then(response => response.data);
 }
 
+export const updateUser = (id, data) => {
+    return axiosClient().put(`user/${id}`, JSON.stringify(data)).then(response => response.data);
+}
+
 export const getUserList = () => {
     return axiosClient().get('user').then(response => response.data)
 }

@@ -6,6 +6,8 @@ import { CrossIcon } from "../../../ui/Icons";
 
 const UpdateUserPayroll = ({ payrollDetails, user, onClose }) => {
 
+    const payrollId = user?.payroll?._id
+
     const { HRA, Conveyance, WashingAllowance, MedicalAllowance, OtherAllowance, EmployeePF, EmployeesESIC, MLWF, PT, EmployerPF, EmployerESIC, _id } = payrollDetails;
 
     const [updatedItems, setUpdatedItems] = useState({});
@@ -99,11 +101,11 @@ const UpdateUserPayroll = ({ payrollDetails, user, onClose }) => {
         }
 
         // Call the API to update the payroll data
-        updatePayrollDetails(user, updatedPayrollData).then((response) => {
+        updatePayrollDetails(payrollId, updatedPayrollData).then((response) => {
 
             if (response.error === false) {
                 // console.log(response.error);
-                // console.log(response.updatedPayroll);
+                console.log(response.updatedPayroll);
                 console.log("Payroll Updated!")
 
                 // Reset the updated items and set isEditing to false for updated items

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CrossIcon, DownloadIcon } from '../../ui/Icons';
 import ProfileForm from './ProfileForm';
-import { getCompanyById, getTodayAttendance } from '../../api/apiUrl';
+import { getCompanyById, getTodayAttendance, updateUser } from '../../api/apiUrl';
 import UpdateProfilePhoto from './ViewFields/UpdateProfilePhoto';
 import UpdateFileUpload from './ViewFields/UpdateFileUpload';
 import default_image from '../../assets/images/default_image.svg'
@@ -123,21 +123,21 @@ const Profile = ({ user, companyDetails, onBack, formatDate }) => {
 
         // console.log(_id, updatedData)
 
-        // updateEmployee(_id, updatedData).then((response) => {
-        //     if (response.error === false) {
-        //         console.log(response.message)
+        updateUser(_id, updatedData).then((response) => {
+            if (response.error === false) {
+                // console.log(response)
 
-        //         setIsEditMode(false);
-        //         // setMessage('User data updated successfully!');
+                setIsEditMode(false);
+                setMessage('User data updated successfully!');
 
-        //         setTimeout(() => {
-        //             setMessage('')
-        //         }, [2000])
-        //     }
-        // }).catch((error) => {
-        //     console.log(error);
-        //     setMessage('Failed to update user data!');
-        // });
+                setTimeout(() => {
+                    setMessage('')
+                }, [3000])
+            }
+        }).catch((error) => {
+            console.log(error);
+            setMessage('Failed to update user data!');
+        });
     };
 
     // Get the current date

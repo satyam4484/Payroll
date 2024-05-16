@@ -1,13 +1,58 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getPayrollDetails } from '../../../api/apiUrl'
 import UpdateUserPayroll from './UpdateUserPayroll'
 import AddUserPayroll from './AddUserPayroll'
 
-const UserPayrollDetails = ({ user, payrollDetails, dataLoaded, isPayroll, setIsPayroll, onBack, handleOpen, openPayroll, role }) => {
+const UserPayrollDetails = ({ user, isPayroll, setIsPayroll, onBack, handleOpen, openPayroll, setOpenPayroll, setShowProfile }) => {
 
-    const userId = user?._id
+    const userId = user._id
+    const payrollId = user?.payroll?._id
+    if (user?.payroll) {
+        localStorage.removeItem('userPayrollId')
+    }
+    console.log(payrollId)
+    const newPayrollId = localStorage.getItem('userPayrollId')
+    console.log(newPayrollId)
 
+    const [dataLoaded, setDataLoaded] = useState(false);
+    const [payrollDetails, setPayrollDetails] = useState([]);
     const [openAddPayroll, setOpenAddPayroll] = useState(false);
+
+    // Function to handle get Payroll Details
+    useEffect(() => {
+        if (userId && payrollId ? payrollId : newPayrollId) {
+            getPayrollDetails(payrollId ? payrollId : newPayrollId).then((response) => {
+                if (response.error === false) {
+                    // console.log(response)
+                    setPayrollDetails(response.payroll);
+                    setOpenPayroll(true);
+                    setDataLoaded(true)
+                    setIsPayroll(false);
+                    setShowProfile(false);
+                }
+            }).catch((error) => {
+                // setError('Unable to view payroll details!')
+                // setTimeout(() => {
+                //     setError('');
+                // }, 2000);
+                // setIsPayroll(Object.keys(response.payroll).length > 0)
+                setIsPayroll(true);
+                setShowProfile(false);
+                setOpenPayroll(false);
+                setDataLoaded(false)
+                setIsPayroll(true);
+                console.log(error);
+            });
+        } else {
+            console.log('No Company ID Selected!');
+            setIsPayroll(true);
+            setShowProfile(false);
+            setOpenPayroll(false);
+            setDataLoaded(false)
+            setIsPayroll(true);
+        }
+    }, [])
+
 
     const handleAddPayrollDetails = () => {
         if (userId) {
@@ -16,6 +61,7 @@ const UserPayrollDetails = ({ user, payrollDetails, dataLoaded, isPayroll, setIs
         }
     }
 
+
     return (
         <>
             {/* Payroll Modal */}
@@ -23,7 +69,7 @@ const UserPayrollDetails = ({ user, payrollDetails, dataLoaded, isPayroll, setIs
                 dataLoaded && openPayroll && !isPayroll && (
                     <UpdateUserPayroll
                         payrollDetails={payrollDetails}
-                        user={userId}
+                        userProps={user}
                         onClose={onBack}
                     />
                 )
@@ -47,9 +93,8 @@ const UserPayrollDetails = ({ user, payrollDetails, dataLoaded, isPayroll, setIs
             {
                 openAddPayroll && (
                     <AddUserPayroll
-                        user={userId}
+                        userProps={userId}
                         onClose={onBack}
-                        userRole={role}
                     />
                 )
             }
