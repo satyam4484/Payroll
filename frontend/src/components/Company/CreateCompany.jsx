@@ -43,17 +43,18 @@ const CreateCompany = () => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post(`${BASE_URL}file/upload/`,
+            const response = await axios.post(`${BASE_URL}file/upload/Company`,
                 formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
-            console.log(response.data.message)
+            console.log("File Uploaded Successfully!")
+            console.log(response.data.s3FileUrl)
 
             if (name === 'profilePhoto') {
-                setProfileFileUrl(response.data.data)
+                setProfileFileUrl(response.data.s3FileUrl)
             } else {
                 console.log('No file url found!')
             }
@@ -150,7 +151,7 @@ const CreateCompany = () => {
         // Create a function to format the common data
         const commonData = {
             name: formData.name || '',
-            logo: profileFileUrl || 'https://example.com/logo.png',
+            logo: profileFileUrl || '',
             email: formData.email || '',
             contact: formData.phoneNumber || '',
             address: formData.address || '',

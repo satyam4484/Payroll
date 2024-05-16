@@ -1,25 +1,37 @@
 import React, { useState } from "react";
-import { CrossIcon, DownloadIcon } from '../../../ui/Icons';
-import { addPayrollDetails } from '../../../api/apiUrl'
+import { updatePayrollDetails, addPayrollDetails } from '../../../api/apiUrl'
 import PayrollFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollViewFormat";
 import PayrollEditFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollEditFormat";
+import { CrossIcon } from "../../../ui/Icons";
 
-const AddUserPayroll = ({ user, onClose, userRole }) => {
+const UpdateUserPayroll = ({ payrollDetails, userProps, onClose }) => {
+
+    const payrollId = userProps?.payroll?._id
+
+    const { HRA, Conveyance, WashingAllowance, MedicalAllowance, OtherAllowance, EmployeePF, EmployeesESIC, MLWF, PT, EmployerPF, EmployerESIC, _id } = payrollDetails;
 
     const [updatedItems, setUpdatedItems] = useState({});
     const [editableItems, setEditableItems] = useState({
-        HRA: { value: 0, operation: 0 },
-        Conveyance: { value: 0, operation: 0 },
-        WashingAllowance: { value: 0, operation: 0 },
-        MedicalAllowance: { value: 0, operation: 0 },
-        OtherAllowance: { value: 0, operation: 0 },
-        EmployeePF: { value: 0, operation: 0 },
-        EmployeesESIC: { value: 0, operation: 0 },
-        MLWF: { value: 0, operation: 0 },
-        PT: { value: 0, operation: 0 },
-        EmployerPF: { value: 0, operation: 0 },
-        EmployerESIC: { value: 0, operation: 0 },
+        HRA: { value: HRA?.value, operation: HRA?.operation },
+        Conveyance: { value: Conveyance?.value, operation: Conveyance?.operation },
+        WashingAllowance: { value: WashingAllowance?.value, operation: WashingAllowance?.operation },
+        MedicalAllowance: { value: MedicalAllowance?.value, operation: MedicalAllowance?.operation },
+        OtherAllowance: { value: OtherAllowance?.value, operation: OtherAllowance?.operation },
+        EmployeePF: { value: EmployeePF?.value?.$numberDecimal, operation: EmployeePF?.operation },
+        EmployeesESIC: { value: EmployeesESIC?.value?.$numberDecimal, operation: EmployeesESIC?.operation },
+        PT: { value: PT?.value, operation: PT?.operation },
+        MLWF: { value: MLWF?.value, operation: MLWF?.operation },
+        EmployerPF: { value: EmployerPF?.value?.$numberDecimal, operation: EmployerPF?.operation },
+        EmployerESIC: { value: EmployerESIC?.value?.$numberDecimal, operation: EmployerESIC?.operation },
     });
+
+
+    // Formatted date
+    const date = new Date();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
 
     // Function to toggle edit mode for a payroll item
     const toggleEditMode = (itemName) => {
@@ -96,15 +108,13 @@ const AddUserPayroll = ({ user, onClose, userRole }) => {
             }
         }
 
-        updatedPayrollData.type = userRole
-        updatedPayrollData._id = user
-
         // Call the API to update the payroll data
-        addPayrollDetails(updatedPayrollData).then((response) => {
+        updatePayrollDetails(payrollId, updatedPayrollData).then((response) => {
 
             if (response.error === false) {
-                // console.log(response);
-                console.log("Payroll New Added!")
+                // console.log(response.error);
+                console.log(response.updatedPayroll);
+                console.log("Payroll Updated!")
 
                 // Reset the updated items and set isEditing to false for updated items
                 const resetUpdatedItems = {};
@@ -157,10 +167,13 @@ const AddUserPayroll = ({ user, onClose, userRole }) => {
 
     return (
         <>
-            <div className="flex items-center justify-center">
-                <p className="text-2xl font-bold plusJakartaSans uppercase">Add Payroll</p>
-            </div>
-            <div className="flex items-center justify-end">
+
+            <div className="flex items-center justify-evenly">
+                <p className="text-2xl font-bold plusJakartaSans uppercase">Payroll</p>
+                <div className="bg-white px-3 py-1 rounded-xl">
+                    <p className='text-gray-500 text-sm'>Name:  <span className='plus-jkrt uppercase text-gray-900 font-semibold'>{userProps.name}</span></p>
+                    <p className='text-gray-500 text-sm'>Userid:  <span className='plus-jkrt text-gray-900 font-semibold'>{userProps.user_id}</span></p>
+                </div>
                 <button
                     type="button"
                     onClick={onClose}
@@ -169,6 +182,7 @@ const AddUserPayroll = ({ user, onClose, userRole }) => {
                     <CrossIcon />
                 </button>
             </div>
+
 
             <div>
                 <div className="grid grid-cols-12 place-items-center ">
@@ -194,4 +208,4 @@ const AddUserPayroll = ({ user, onClose, userRole }) => {
     );
 };
 
-export default AddUserPayroll;
+export default UpdateUserPayroll;

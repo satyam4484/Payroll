@@ -30,8 +30,8 @@ const UpdateFileUpload = ({ onUpload, message, setMessage }) => {
                     setMessage('')
                 }, 2000);
 
-                console.log(response.data.message)
-                const uploadedUrl = response.data.data;
+                console.log(response.data.s3FileUrl)
+                const uploadedUrl = response.data.s3FileUrl;
                 onUpload(uploadedUrl);
             } catch (error) {
                 console.error('Error uploading file:', error);

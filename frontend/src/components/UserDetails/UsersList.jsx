@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { getCompanyById, getPayrollDetails, getUserList, getUserProfile } from '../../api/apiUrl'
 import { Filter, SearchIcon2 } from '../../ui/Icons'
 import default_image from '../../assets/images/default_image.svg'
-import MarkAttendance from './MarkAttendance'
-import Profile from './Profile'
-import UserPayrollDetails from './UserPayroll/UserPayrollDetails'
+import MarkAttendance from './Attendance/MarkAttendance'
+import Profile from './ViewProfile/Profile'
+import UserPayrollDetails from './ViewPayroll/UserPayrollDetails'
 
 const UsersList = () => {
 
@@ -15,18 +15,13 @@ const UsersList = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [filteredSupervisors, setFilteredSupervisors] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedUserRole, setSelectedUserRole] = useState(null);
 
   const [showProfile, setShowProfile] = useState(false);
   const [showMarkAttendance, setShowMarkAttendance] = useState(false);
   const [showViewPayroll, setShowViewPayroll] = useState(false);
 
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [payrollDetails, setPayrollDetails] = useState([]);
   const [isPayroll, setIsPayroll] = useState(false);
   const [openPayroll, setOpenPayroll] = useState(false);
-
-  const userId = localStorage.getItem('userId')
 
   const fetchEmployeeData = () => {
     getUserList().then((response) => {
@@ -99,7 +94,6 @@ const UsersList = () => {
         if (response.error === false) {
           // console.log(response.user._id)
           setSelectedUser(response.user);
-          setSelectedUserRole(response.user.user_role);
           localStorage.setItem('userId', response.user._id)
 
           // Fetch company details
@@ -110,7 +104,7 @@ const UsersList = () => {
                 // console.log(companyResponse.company)
                 setCompanyDetails(companyResponse.company);
               }
-            });
+            })
           }
         }
       }).catch((error) => {
@@ -123,7 +117,6 @@ const UsersList = () => {
   // Close employee details
   const handleBackToEmployeeList = () => {
     setSelectedUser(null);
-    setSelectedUserRole(null);
     setShowProfile(false);
     setShowMarkAttendance(false);
     setShowViewPayroll(false);
@@ -155,33 +148,7 @@ const UsersList = () => {
     setOpenPayroll(!openPayroll)
   };
 
-  // Function to handle get Payroll Details
-  const handlePayrollDetails = () => {
 
-    if (userId) {
-      getPayrollDetails(userId).then((response) => {
-        if (response.error === false) {
-          // console.log(response)
-          setPayrollDetails(response.payroll);
-          setOpenPayroll(true);
-          setDataLoaded(true)
-          setIsPayroll(false);
-          setShowProfile(false);
-        }
-      }).catch((error) => {
-        // setError('Unable to view payroll details!')
-        // setTimeout(() => {
-        //     setError('');
-        // }, 2000);
-        // setIsPayroll(Object.keys(response.payroll).length > 0)
-        setIsPayroll(true);
-        setShowProfile(false);
-        console.log(error);
-      });
-    } else {
-      console.log('No Company ID Selected!');
-    }
-  };
 
   return (
     <div>
@@ -189,9 +156,9 @@ const UsersList = () => {
         <>
           {showProfile && <Profile user={selectedUser} companyDetails={companyDetails} onBack={handleBackToEmployeeList} formatDate={formatDate} />}
 
-          {showMarkAttendance && <MarkAttendance user={selectedUser} onBack={handleBackToEmployeeList} />}
+          {showMarkAttendance && <MarkAttendance user={selectedUser} onBack={handleBackToEmployeeList} setShowProfile={setShowProfile} />}
 
-          {showViewPayroll && <UserPayrollDetails user={selectedUser} role={selectedUserRole} payrollDetails={payrollDetails} dataLoaded={dataLoaded} isPayroll={isPayroll} setIsPayroll={setIsPayroll} onBack={handleBackToEmployeeList} handleOpen={handleOpen} openPayroll={openPayroll} />}
+          {showViewPayroll && <UserPayrollDetails user={selectedUser} isPayroll={isPayroll} setIsPayroll={setIsPayroll} onBack={handleBackToEmployeeList} handleOpen={handleOpen} openPayroll={openPayroll} setOpenPayroll={setOpenPayroll} setShowProfile={setShowProfile} />}
         </>
       ) : (
         <>
@@ -240,7 +207,6 @@ const UsersList = () => {
                       className='border border-[#2F80EF] rounded-[2.5rem] px-6 py-4 mb-4 w-full h-full text-xs bg-white shadow-lg cursor-pointer'
                       onClick={() => {
                         handleUserCardClick(item)
-                        setShowProfile(true)
                       }}
                     >
 
@@ -273,13 +239,14 @@ const UsersList = () => {
                       <div className='flex justify-between mt-2'>
                         <button className='p-1 rounded-lg text-xs font-medium border border-lime-500 outline-none text-lime-800 hover:bg-lime-500 hover:text-white' onClick={() => setShowProfile(true)}>View Profile</button>
 
-                        <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-deep-orange-400 outline-none text-deep-orange-400 hover:bg-deep-orange-400 hover:text-white' onClick={() => setShowMarkAttendance(true)}>Mark attendance</button>
+                        <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-deep-orange-400 outline-none text-deep-orange-400 hover:bg-deep-orange-400 hover:text-white' onClick={() => {
+                          setShowMarkAttendance(true)
+                        }}>Mark attendance</button>
 
                         <button
                           className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-indigo-400 outline-none text-indigo-400 hover:bg-indigo-400 hover:text-white'
                           onClick={() => {
                             setShowViewPayroll(true)
-                            handlePayrollDetails()
                           }
                           }
                         >View Payroll</button>
@@ -315,7 +282,6 @@ const UsersList = () => {
                       className='border border-[#2F80EF] rounded-[2.5rem] px-6 py-4 mb-4 w-full h-full text-xs bg-white shadow-lg cursor-pointer'
                       onClick={() => {
                         handleUserCardClick(item)
-                        setShowProfile(true)
                       }}
                     >
 
@@ -345,7 +311,7 @@ const UsersList = () => {
                         <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-indigo-400 outline-none text-indigo-400 hover:bg-indigo-400 hover:text-white'
                           onClick={() => {
                             setShowViewPayroll(true)
-                            handlePayrollDetails()
+                            // handlePayrollDetails()
                           }
                           }>View Payroll</button>
                       </div>

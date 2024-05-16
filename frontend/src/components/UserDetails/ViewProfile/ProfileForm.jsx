@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { DownloadIcon } from '../../ui/Icons'
+import { DownloadIcon } from '../../../ui/Icons'
 
 const ProfileForm = ({ label, fieldName, newClass, downloadPath, isEditMode, handleFieldChange }) => {
 

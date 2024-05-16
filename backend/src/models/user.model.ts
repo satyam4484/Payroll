@@ -49,7 +49,7 @@ const userSchema = new Schema<UserInterface>({
     password: { type: String, required: true },
     user_role: {
         type: String,
-        enum: ["Employee", "Employer", "Admin", "CEO"], // User role values
+        enum: ["Employee", "Supervisor", "Admin", "CEO"], // User role values
     },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     company: { type: Schema.Types.ObjectId, ref: 'Company', required: true },

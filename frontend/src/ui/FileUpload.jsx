@@ -17,7 +17,7 @@ const FileUpload = ({ name, inputRef, handleFileChange, handleSelectFile, fileUr
 
             {
                 fileUrl && (
-                    <p className='absolute capitalize -bottom-4 right-0 mx-2 text-[0.7rem] italic text-green-500'>
+                    <p className='absolute capitalize -bottom-0 right-0 mx-2 text-[0.7rem] italic text-green-500'>
                         File Uploaded Successfully!
                     </p>
                 )

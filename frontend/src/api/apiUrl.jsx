@@ -15,6 +15,10 @@ export const createNewUser = (data) => {
     return axiosClient().post('user', JSON.stringify(data)).then(response => response.data);
 }
 
+export const updateUser = (id, data) => {
+    return axiosClient().put(`user/${id}`, JSON.stringify(data)).then(response => response.data);
+}
+
 export const getUserList = () => {
     return axiosClient().get('user').then(response => response.data)
 }
@@ -51,6 +55,10 @@ export const getTodayAttendance = (id, date) => {
     return axiosClient().get(`attendance/today/${id}?date=${date}`).then(response => response.data)
 }
 
+export const markAttendance = (data) => {
+    return axiosClient().post('attendance/mark', JSON.stringify(data)).then(response => response.data)
+}
+
 
 /* Payroll */
 
@@ -65,5 +73,3 @@ export const getPayrollDetails = (id) => {
 export const updatePayrollDetails = (id, data) => {
     return axiosClient().put(`payroll/${id}`, JSON.stringify(data)).then(response => response.data)
 }
-
-/* File Upload */
