@@ -10,9 +10,8 @@ const UserPayrollDetails = ({ user, isPayroll, setIsPayroll, onBack, handleOpen,
     if (user?.payroll) {
         localStorage.removeItem('userPayrollId')
     }
-    console.log(payrollId)
+
     const newPayrollId = localStorage.getItem('userPayrollId')
-    console.log(newPayrollId)
 
     const [dataLoaded, setDataLoaded] = useState(false);
     const [payrollDetails, setPayrollDetails] = useState([]);
@@ -78,6 +77,10 @@ const UserPayrollDetails = ({ user, isPayroll, setIsPayroll, onBack, handleOpen,
             {
                 isPayroll && (
                     <div className='bg-white rounded-xl p-4 text-center space-y-3 shadow-md mx-3'>
+                        <div className="bg-white px-3 py-1 rounded-xl">
+                            <p className='text-gray-500 text-sm'>Name:  <span className='plus-jkrt uppercase text-gray-900 font-semibold'>{user.name}</span></p>
+                            <p className='text-gray-500 text-sm'>Userid:  <span className='plus-jkrt text-gray-900 font-semibold'>{user.user_id}</span></p>
+                        </div>
                         <p className='text-red-400 italic text-sm'>No Payroll Found!</p>
                         <button
                             className='plus-jkrt font-medium shadow-md bg-green-400 text-white text-xs px-2 py-1 rounded-lg'
@@ -93,7 +96,7 @@ const UserPayrollDetails = ({ user, isPayroll, setIsPayroll, onBack, handleOpen,
             {
                 openAddPayroll && (
                     <AddUserPayroll
-                        userProps={userId}
+                        userProps={user}
                         onClose={onBack}
                     />
                 )

@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { CrossIcon, DownloadIcon } from '../../../ui/Icons';
+import { CrossIcon } from '../../../ui/Icons';
 import { addPayrollDetails } from '../../../api/apiUrl'
-import PayrollFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollViewFormat";
-import PayrollEditFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollEditFormat";
 
-const AddUserPayroll = ({ user, onClose }) => {
+const AddUserPayroll = ({ userProps, onClose }) => {
 
     const [newPayrollId, setNewPayrollId] = useState('')
     const [isEditing, setIsEditing] = useState(false)
@@ -75,7 +73,7 @@ const AddUserPayroll = ({ user, onClose }) => {
         setIsEditing(false)
 
         editableItems.type = "Employee"
-        editableItems._id = user
+        editableItems._id = userProps._id
 
         // Call the API to update the payroll data
         addPayrollDetails(editableItems).then((response) => {
@@ -160,11 +158,15 @@ const AddUserPayroll = ({ user, onClose }) => {
         <>
             <div className="flex items-center justify-around">
                 <p className="text-2xl font-bold plusJakartaSans uppercase">Add Payroll</p>
+                <div className="bg-white px-3 py-1 rounded-xl">
+                    <p className='text-gray-500 text-sm'>Name:  <span className='plus-jkrt uppercase text-gray-900 font-semibold'>{userProps.name}</span></p>
+                    <p className='text-gray-500 text-sm'>Userid:  <span className='plus-jkrt text-gray-900 font-semibold'>{userProps.user_id}</span></p>
+                </div>
+
                 <button onClick={handleSubmit} className='border border-green-500 focus:shadow-none hover:bg-green-500 hover:text-white font-normal px-3 py-1 text-sm rounded-lg shadow-md disabled:cursor-not-allowed disabled:bg-green-500 disabled:text-white' disabled={isEditing}>
                     {isEditing ? 'Done' : 'Submit'}
                 </button>
-            </div>
-            <div className="flex items-center justify-end">
+
                 <button
                     type="button"
                     onClick={onClose}

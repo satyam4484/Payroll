@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { CrossIcon, DownloadIcon } from '../../ui/Icons';
+import { CrossIcon, DownloadIcon } from '../../../ui/Icons';
 import ProfileForm from './ProfileForm';
-import { getCompanyById, getTodayAttendance, updateUser } from '../../api/apiUrl';
-import UpdateProfilePhoto from './ViewFields/UpdateProfilePhoto';
-import UpdateFileUpload from './ViewFields/UpdateFileUpload';
-import default_image from '../../assets/images/default_image.svg'
+import { getCompanyById, getTodayAttendance, updateUser } from '../../../api/apiUrl';
+import UpdateProfilePhoto from './UpdateProfilePhoto';
+import UpdateFileUpload from './UpdateFileUpload';
+import default_image from '../../../assets/images/default_image.svg'
 
 const Profile = ({ user, companyDetails, onBack, formatDate }) => {
     // console.log(user)

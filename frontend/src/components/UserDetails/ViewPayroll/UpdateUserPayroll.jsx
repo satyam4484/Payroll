@@ -4,9 +4,9 @@ import PayrollFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails
 import PayrollEditFormat from "../../CompanyDetails/DropPaymentConfig/PayrollDetails/PayrollEditFormat";
 import { CrossIcon } from "../../../ui/Icons";
 
-const UpdateUserPayroll = ({ payrollDetails, user, onClose }) => {
+const UpdateUserPayroll = ({ payrollDetails, userProps, onClose }) => {
 
-    const payrollId = user?.payroll?._id
+    const payrollId = userProps?.payroll?._id
 
     const { HRA, Conveyance, WashingAllowance, MedicalAllowance, OtherAllowance, EmployeePF, EmployeesESIC, MLWF, PT, EmployerPF, EmployerESIC, _id } = payrollDetails;
 
@@ -24,6 +24,14 @@ const UpdateUserPayroll = ({ payrollDetails, user, onClose }) => {
         EmployerPF: { value: EmployerPF?.value?.$numberDecimal, operation: EmployerPF?.operation },
         EmployerESIC: { value: EmployerESIC?.value?.$numberDecimal, operation: EmployerESIC?.operation },
     });
+
+
+    // Formatted date
+    const date = new Date();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
 
     // Function to toggle edit mode for a payroll item
     const toggleEditMode = (itemName) => {
@@ -159,11 +167,13 @@ const UpdateUserPayroll = ({ payrollDetails, user, onClose }) => {
 
     return (
         <>
-            <div className="flex items-center justify-center">
-                <p className="text-2xl font-bold plusJakartaSans uppercase">Payroll</p>
-            </div>
 
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-evenly">
+                <p className="text-2xl font-bold plusJakartaSans uppercase">Payroll</p>
+                <div className="bg-white px-3 py-1 rounded-xl">
+                    <p className='text-gray-500 text-sm'>Name:  <span className='plus-jkrt uppercase text-gray-900 font-semibold'>{userProps.name}</span></p>
+                    <p className='text-gray-500 text-sm'>Userid:  <span className='plus-jkrt text-gray-900 font-semibold'>{userProps.user_id}</span></p>
+                </div>
                 <button
                     type="button"
                     onClick={onClose}
@@ -172,6 +182,8 @@ const UpdateUserPayroll = ({ payrollDetails, user, onClose }) => {
                     <CrossIcon />
                 </button>
             </div>
+
+
             <div>
                 <div className="grid grid-cols-12 place-items-center ">
                     <div className="md:col-span-6 sm:col-span-12">

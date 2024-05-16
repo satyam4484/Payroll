@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { getCompanyById, getPayrollDetails, getUserList, getUserProfile } from '../../api/apiUrl'
 import { Filter, SearchIcon2 } from '../../ui/Icons'
 import default_image from '../../assets/images/default_image.svg'
-import MarkAttendance from './MarkAttendance'
-import Profile from './Profile'
-import UserPayrollDetails from './UserPayroll/UserPayrollDetails'
+import MarkAttendance from './Attendance/MarkAttendance'
+import Profile from './ViewProfile/Profile'
+import UserPayrollDetails from './ViewPayroll/UserPayrollDetails'
 
 const UsersList = () => {
 
@@ -241,14 +241,12 @@ const UsersList = () => {
 
                         <button className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-deep-orange-400 outline-none text-deep-orange-400 hover:bg-deep-orange-400 hover:text-white' onClick={() => {
                           setShowMarkAttendance(true)
-                          setShowProfile(false)
                         }}>Mark attendance</button>
 
                         <button
                           className='p-1 rounded-lg text-xs font-medium plus-jkrt border border-indigo-400 outline-none text-indigo-400 hover:bg-indigo-400 hover:text-white'
                           onClick={() => {
                             setShowViewPayroll(true)
-                            setShowProfile(false)
                           }
                           }
                         >View Payroll</button>
@@ -284,7 +282,6 @@ const UsersList = () => {
                       className='border border-[#2F80EF] rounded-[2.5rem] px-6 py-4 mb-4 w-full h-full text-xs bg-white shadow-lg cursor-pointer'
                       onClick={() => {
                         handleUserCardClick(item)
-                        setShowProfile(true)
                       }}
                     >
 

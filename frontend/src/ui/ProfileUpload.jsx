@@ -19,7 +19,7 @@ const ProfileUpload = ({ inputRef, name, handleFileChange, handleSelectFile, fil
 
             {/* ViewProfilePic */}
             <div>
-                <img src={fileUrl ? fileUrl : default_image} alt='default_image' name='profile' className='w-28 h-28 object-cover rounded-full shadow-gray-400 shadow-md' />
+                <img src={fileUrl ? fileUrl : default_image} alt='default_image' name='profile' className='w-28 h-28 object-cover rounded-full shadow-gray-400 shadow-md text-xs' />
             </div>
         </>
     )
