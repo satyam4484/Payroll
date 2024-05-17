@@ -3,7 +3,7 @@ import multer from 'multer';
 
 const upload = multer({ dest: 'uploads/' });
 
-import { markAttendance, getTodayAttendance, generateAttendanceExcel, markAttendanceFromSheet } from '../controllers/attendance.controller';
+import { markAttendance, getTodayAttendance, getMonthlyAttendance,generateAttendanceExcel, markAttendanceFromSheet } from '../controllers/attendance.controller';
 
 const router = express.Router();
 
@@ -12,6 +12,7 @@ router.post('/mark', markAttendance);
 
 // Route to get today's attendance for a user
 router.get('/today/:id', getTodayAttendance);
+router.post('/monthly', getMonthlyAttendance);
 
 
 router.post('/sheet', generateAttendanceExcel);
