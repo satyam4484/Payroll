@@ -37,6 +37,18 @@ export const markAttendance = async (req: Request, res: Response) => {
     }
 }
 
+export const getMonthlyAttendance = async (req:Request,res:Response) => {
+    try{
+        const date = new Date(req.body.date as string);
+        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        const attendance = await DailyAttendance.find({user:req.body.user,date:{$gte:startOfMonth,$lte:endOfMonth}}).sort({date:1});
+        res.status(200).send({ error: false ,attendance});
+    }catch (error) {
+        res.status(500).json({ error: true, errorData: { error } });
+    }
+}
+
 export const getTodayAttendance = async (req: Request, res: Response) => {
     try {
         const userId: string = req.params.id;
