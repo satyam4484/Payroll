@@ -26,7 +26,7 @@ const MarkAttendance = ({ user, onBack }) => {
 
                 const response = await getMonthlyAttendance(attendData);
                 if (!response.error) {
-                    console.log(response.attendance)
+                    // console.log(response.attendance)
                     setAttendanceData(response.attendance);
                 }
             } catch (error) {
@@ -38,6 +38,7 @@ const MarkAttendance = ({ user, onBack }) => {
 
     const handleMarkAttendance = () => {
         setAttendanceMarked(false)
+
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -55,7 +56,7 @@ const MarkAttendance = ({ user, onBack }) => {
 
         markAttendance(attendanceData).then((response) => {
             if (!response.error) {
-                console.log(response.Mesage);
+                // console.log(response);
                 setAttendanceMarked(true)
 
                 setTimeout(() => {
@@ -137,12 +138,15 @@ const MarkAttendance = ({ user, onBack }) => {
                     recordDate.getDate() === date.getDate();
             });
 
-            const isPresent = attendanceRecord !== undefined  ;
+            const isPresent = attendanceRecord && (attendanceRecord.status.$numberDecimal === "0.5" || attendanceRecord.status.$numberDecimal === "1");
+
+            const bgColorClass = !attendanceRecord ? 'bg-gray-100/70' :
+                isPresent ? ' bg-green-500/70 hover:bg-green-500/30 border border-green-500 ' : 'bg-red-500/50 border border-red-500 hover:bg-red-500/30';
 
             days.push(
                 <div className='flex justify-center' key={i}>
                     <div
-                        className={`day calendar hover:bg-gray-200 hover:text-black ${isToday ? 'bg-blue-200' : ''} ${isSelectedDate ? 'bg-blue-500 text-white' : ''} ${isFutureDate ? 'hover:text-gray-400 text-gray-400 cursor-not-allowed' : 'cursor-pointer'} ${!isFutureDate && isPresent ? 'hover:bg-green-100 bg-green-500/70 border border-green-500' : !isFutureDate ? 'hover:bg-red-100 bg-red-500/50 border border-red-500' : ''}`}
+                        className={`flex items-center justify-center w-[40px] h-[40px] rounded-full shadow-md ${isToday && 'border border-blue-500 text-blue-500 font-semibold'} ${isSelectedDate && 'font-semibold scale-105 border border-yellow-500'} ${isFutureDate ? 'hover:text-gray-400 text-gray-400 cursor-not-allowed' : 'cursor-pointer'} ${bgColorClass}`}
                         onClick={() => !isFutureDate && handleDateClick(date)}
                     >
                         {i}
@@ -234,7 +238,7 @@ const MarkAttendance = ({ user, onBack }) => {
 
                         {/* Status */}
                         <label className="flex items-center mt-2">
-                            Status:
+                            <span className='text-sm text-gray-500'>Status:</span>
                             <select
                                 value={status}
                                 onChange={(e) =>
@@ -252,7 +256,7 @@ const MarkAttendance = ({ user, onBack }) => {
                         {/* Overtime */}
                         {(status === 0.5 || status === 1) && (
                             <label className="flex items-center mt-2">
-                                Overtime:
+                                <span className='text-sm text-gray-500'>Overtime:</span>
                                 <input
                                     type="number"
                                     value={overtime}
