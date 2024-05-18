@@ -1,0 +1,40 @@
+# pre-commit.yaml
+
+# Run lint-staged before each commit
+lint-staged:
+  '*.ts':
+    - eslint --fix
+    - prettier --write
+
+# Specify the linters and formatters
+eslint:
+  extensions:
+    - .ts
+  files:
+    - src/**/*.ts
+
+prettier:
+  extensions:
+    - .ts
+  files:
+    - src/**/*.ts
+
+# Specify the plugins and configurations for eslint and prettier
+plugins:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v7.0.0
+    hooks:
+      - id: eslint
+        additional_dependencies:
+          - eslint@^7.0.0
+          - @typescript-eslint/parser@^4.0.0
+          - @typescript-eslint/eslint-plugin@^4.0.0
+  - repo: https://github.com/prettier/prettier
+    rev: 2.5.1
+    hooks:
+      - id: prettier

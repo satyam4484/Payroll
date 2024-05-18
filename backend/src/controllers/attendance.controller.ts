@@ -23,14 +23,22 @@ export const markAttendance = async (req: Request, res: Response) => {
     try {
         const data: DailyAttendanceInterface = req.body;
         const date: Date = new Date(data.date);
-        const dailyattendance = new DailyAttendance({
-            user: data.user,
-            date,
-            status: data.status,
-            overtime: data.overtime
-        });
-        await dailyattendance.save();
-        res.status(201).send({ error: false, Mesage: "Attendance Marked Successfully" })
+        const prevAttendance:any = await DailyAttendance.findOne({user:data.user,date});
+        if(! prevAttendance) {
+            const dailyattendance = new DailyAttendance({
+                user: data.user,
+                date,
+                status: data.status,
+                overtime: data.overtime
+            });
+            const newAttendance = await dailyattendance.save();
+            res.status(201).send({ error: false, Mesage: "Attendance Marked Successfully",newAttendance })
+        }else{
+            console.log("attendance was previosuly marked")
+            const dailyattendance = await DailyAttendance.findByIdAndUpdate(prevAttendance._id,{$set:{status:data.status,overtime:data.overtime}},{$new:true});
+            res.status(201).send({ error: false, Mesage: "Attendance Marked Successfully",dailyattendance })
+        }
+
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: true, errorData: { error } });
