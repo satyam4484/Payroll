@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { CrossIcon } from '../../../ui/Icons'
-import { getTodayAttendance, markAttendance } from '../../../api/apiUrl'
+import { getTodayAttendance, getMonthlyAttendance, markAttendance } from '../../../api/apiUrl'
 
 const MarkAttendance = ({ user, onBack }) => {
 
@@ -9,14 +9,32 @@ const MarkAttendance = ({ user, onBack }) => {
     const [status, setStatus] = useState(0); // Default to absent
     const [overtime, setOvertime] = useState('');
     const [attendanceMarked, setAttendanceMarked] = useState(false);
+    const [attendanceData, setAttendanceData] = useState([]);
 
-    // getTodayAttendance("663c4d594b529061f36d3481", "2024-05-12").then((response) => {
-    //     if (response.error === false) {
-    //         console.log(response.error)
-    //     }
-    // }).catch((error) => {
-    //     console.log(error)
-    // })
+    // Fetch monthly attendance data when the component mounts or selectedDate changes
+    useEffect(() => {
+        const fetchAttendanceData = async () => {
+            try {
+                const year = selectedDate.getFullYear();
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const formattedDate = `${year}-${month}`
+
+                const attendData = {
+                    user: user._id,
+                    date: formattedDate
+                }
+
+                const response = await getMonthlyAttendance(attendData);
+                if (!response.error) {
+                    console.log(response.attendance)
+                    setAttendanceData(response.attendance);
+                }
+            } catch (error) {
+                console.error("Error fetching attendance data:", error);
+            }
+        };
+        fetchAttendanceData();
+    }, [selectedDate, user._id]);
 
     const handleMarkAttendance = () => {
         setAttendanceMarked(false)
@@ -28,7 +46,6 @@ const MarkAttendance = ({ user, onBack }) => {
 
         const attendanceData = {
             user: user._id,
-            // date: selectedDate.toISOString().split('T')[0],
             date: formattedDate,
             status: status,
             overtime: overtime ? overtime : 0
@@ -45,6 +62,29 @@ const MarkAttendance = ({ user, onBack }) => {
                     setAttendanceMarked(false)
                 }, 2000)
 
+                // Refetch attendance data after marking attendance
+                const fetchAttendanceData = async () => {
+                    try {
+                        const year = selectedDate.getFullYear();
+                        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                        const formattedDate = `${year}-${month}`
+
+                        const attendData = {
+                            user: user._id,
+                            date: formattedDate
+                        }
+
+                        const response = await getMonthlyAttendance(attendData);
+
+                        if (!response.error) {
+                            setAttendanceData(response.attendance);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching attendance data:", error);
+                    }
+                };
+                fetchAttendanceData();
+
             }
         }).catch((error) => {
             console.log(error);
@@ -55,14 +95,9 @@ const MarkAttendance = ({ user, onBack }) => {
     }
 
     const handleDateClick = (date) => {
-        // Show modal or set state to display modal for marking attendance
         const today = new Date();
-        if (date > today) {
-            // If the selected date is in the future, set it to today's date
-            return
-        } else {
-            setSelectedDate(date);
-        }
+        if (date > today) return;
+        setSelectedDate(date);
         setModalOpen(true);
     };
 
@@ -91,16 +126,24 @@ const MarkAttendance = ({ user, onBack }) => {
                 i === today.getDate() &&
                 selectedDate.getMonth() === today.getMonth() &&
                 selectedDate.getFullYear() === today.getFullYear();
-            // const isPastDate = date < today ;
+
             const isFutureDate = date > today;
             const isSelectedDate = date.toDateString() === selectedDate.toDateString();
 
+            const attendanceRecord = attendanceData.find(record => {
+                const recordDate = new Date(record.date);
+                return recordDate.getFullYear() === date.getFullYear() &&
+                    recordDate.getMonth() === date.getMonth() &&
+                    recordDate.getDate() === date.getDate();
+            });
+
+            const isPresent = attendanceRecord !== undefined  ;
+
             days.push(
-                <div className='flex justify-center'>
+                <div className='flex justify-center' key={i}>
                     <div
-                        key={i}
-                        className={`day calendar hover:bg-gray-200 ${isToday ? 'bg-blue-200' : ''} ${isSelectedDate ? 'bg-blue-500 text-white' : ''} ${isFutureDate ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer'}`}
-                        onClick={() => handleDateClick(date)}
+                        className={`day calendar hover:bg-gray-200 hover:text-black ${isToday ? 'bg-blue-200' : ''} ${isSelectedDate ? 'bg-blue-500 text-white' : ''} ${isFutureDate ? 'hover:text-gray-400 text-gray-400 cursor-not-allowed' : 'cursor-pointer'} ${!isFutureDate && isPresent ? 'hover:bg-green-100 bg-green-500/70 border border-green-500' : !isFutureDate ? 'hover:bg-red-100 bg-red-500/50 border border-red-500' : ''}`}
+                        onClick={() => !isFutureDate && handleDateClick(date)}
                     >
                         {i}
                     </div>
@@ -129,6 +172,7 @@ const MarkAttendance = ({ user, onBack }) => {
             );
         });
     };
+
 
     // formatted date
     const date = new Date();

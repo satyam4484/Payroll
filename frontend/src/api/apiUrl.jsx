@@ -55,6 +55,10 @@ export const getTodayAttendance = (id, date) => {
     return axiosClient().get(`attendance/today/${id}?date=${date}`).then(response => response.data)
 }
 
+export const getMonthlyAttendance = (data) => {
+    return axiosClient().post('attendance/monthly', JSON.stringify(data)).then(response => response.data)
+}
+
 export const markAttendance = (data) => {
     return axiosClient().post('attendance/mark', JSON.stringify(data)).then(response => response.data)
 }
